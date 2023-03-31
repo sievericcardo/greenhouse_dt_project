@@ -1,0 +1,115 @@
+main
+    Double idealMoisture = 0.0;
+    Double meanMoisture = 0.0;
+    Double threshold = 0.0;
+    Boolean checkWateringNeeded = False;
+
+    Utils utils = new Utils();
+
+    idealMoisture = utils.getIdealMoisture(1, "right", "left");
+    meanMoisture = utils.getMeanMoisture(1, "right", "left");
+    threshold = 0.0;
+    checkWateringNeeded = utils.wateringNeeded(idealMoisture, meanMoisture, threshold);
+
+    if checkWateringNeeded then
+        print("I'm thirsty, please water me!!");
+    else
+        print("I'm ok thank u :-)");
+    end
+end
+
+class Utils()
+
+    // get ideal moisture from the asset model of a plant in a specific pot identified by shelfFloor, groupPosition and potPosition
+    Double getIdealMoisture(Int shelfFloor, String groupPosition, String potPosition)
+        Int i = 0; // counter
+        List<Double> idealMoistureList = null;
+        Int length = 0; // length of the list returned by the query
+        Double idealMoisture = 0.0;
+
+        idealMoistureList = access(
+        "PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+        SELECT ?obj
+        WHERE {
+            ?pot rdf:type ast:Pot ;
+                ast:hasShelfFloor %1 ;
+                ast:hasGroupPosition 'right' ;
+                ast:hasPotPosition 'left' ;
+                ast:hasPlant ?plant .
+            ?plant ast:hasIdealMoisture ?obj .
+        }", shelfFloor, groupPosition, potPosition);
+
+        length = idealMoistureList.length();
+
+        while i < length do
+            idealMoisture = idealMoistureList.get(i);
+            print("ideal moisture:");
+            print(idealMoisture);
+            i = i+1;
+        end
+
+        return idealMoisture;
+    end
+
+
+
+    /**
+    * Queries influxdb to get mean moisture  of a specific pot identified by shelfFloor, groupPosition and potPosition
+    */
+    Double getMeanMoisture(Int shelfFloor, String groupPosition, String potPosition)
+        Int i = 0; // counter
+        List<Double> meanMoistureList = null;
+        Int length = 0; // length of the list returned by the query
+        Double meanMoisture = 0.0;
+
+        meanMoistureList = access(
+        "from(bucket: \"greenhouse_test\")
+            |> range(start: -10d)
+            |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
+            |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
+            |> filter(fn: (r) => r[\"group_position\"] == \"right\")
+            |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
+            |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+            |> keep(columns: [\"_value\"])
+            |> mean(column: \"_value\")",
+        INFLUXDB("config_local.yml"));
+
+        length = meanMoistureList.length();
+
+        i = 0;
+        while i < length do
+            meanMoisture = meanMoistureList.get(i);
+            print("mean moisture:");
+            print(meanMoisture);
+            i = i+1;
+        end
+
+        return meanMoisture;
+    end
+
+    /** 
+    * Check if the plant needs watering
+    */
+    Boolean wateringNeeded(Double idealMoisture, Double meanMoisture, Double threshold)
+        // moistureDifference is the difference between the mean moisture and the ideal moisture, 
+        // if positive it means that the plant is overwatered, if negative it means that the plant is underwatered
+        Double moistureDifference = 0.0;
+        Boolean result = False;
+
+        moistureDifference = meanMoisture - idealMoisture;
+
+        print("moisture difference:");
+        print(moistureDifference);
+
+        print("threshold:");
+        print(threshold);
+
+        if moistureDifference < threshold*-1 then
+            result = True;
+        else
+            result = False; // TODO: add control to check if the plant is overwatered
+        end
+        
+        return result;
+    end
+end
