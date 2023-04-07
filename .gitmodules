@@ -1,6 +1,3 @@
 [submodule "influx_greenhouse_py"]
 	path = influx_greenhouse_py
 	url = https://github.com/N-essuno/influx_greenhouse_py.git
-[submodule "smolang.github.io"]
-	path = smolang.github.io
-	url = https://github.com/smolang/smolang.github.io.git
