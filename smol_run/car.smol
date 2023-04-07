@@ -1,0 +1,21 @@
+main
+    Int i = 0; // counter
+    List<Int> resultList = null;
+    Int result = 0;
+
+    resultList = access(
+    "PREFIX ast: <http://www.semanticweb.org/amato/ontologies/2023/2/sparql-query-issue#>
+    SELECT ?obj
+    WHERE {
+        ?car rdf:type ast:Car ;
+        ?car ast:hasWheelNumber ?obj .
+    }");
+
+    while i < length do
+        result = resultList.get(i);
+        i = i+1;
+    end
+
+    print("wheel number:");
+    print(result);
+end
