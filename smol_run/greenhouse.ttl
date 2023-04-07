@@ -31,11 +31,15 @@ sgh:humidity rdf:type rdfs:Datatype ;
 #################################################################
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#hasGrowthStage
-sgh:hasGrowthStage rdf:type owl:ObjectProperty .
+sgh:hasGrowthStage rdf:type owl:ObjectProperty ;
+                   rdfs:domain sgh:Plant ;
+                   rdfs:range sgh:GrowthStage .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#hasHealthState
-sgh:hasHealthState rdf:type owl:ObjectProperty .
+sgh:hasHealthState rdf:type owl:ObjectProperty ;
+                   rdfs:domain sgh:Plant ;
+                   rdfs:range sgh:HealthState .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#hasPlant
