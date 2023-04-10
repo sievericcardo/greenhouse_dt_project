@@ -1,0 +1,247 @@
+main
+    Int lengthPots = 0;
+    Int lengthShelves = 0;
+    Int lengthPumps = 0;
+    Int i = 0;
+
+    String config = "config_local.yml";
+
+    AssetModel assetModel = new AssetModel();
+    
+    print("--------------------------------------------------- Pots from asset model");
+    List<Pot> pots = assetModel.getPots(config);
+    lengthPots = pots.length();
+    while i < lengthPots do
+        Pot pot = pots.get(i);
+        print("shelfFloor: ");
+        print(pot.shelfFloor);
+        print(" groupPosition: ");
+        print(pot.groupPosition);
+        print(" potPosition: ");
+        print(pot.potPosition);
+        print(" moisture: ");
+        Double moisture = pot.getMoisture();
+        print(moisture);
+        i = i+1;
+    end
+    
+
+    print("--------------------------------------------------- Shelves from asset model");
+    List<Shelf> shelves = assetModel.getShelves(config);
+    lengthShelves = shelves.length();
+    i = 0;
+    while i < lengthShelves do
+        Shelf shelf = shelves.get(i);
+        print("shelfFloor: ");
+        print(shelf.shelfFloor);
+        Double humidity = shelf.getHumidity();
+        print(" humidity: ");
+        print(humidity);
+        Double temperature = shelf.getTemperature();
+        print(" temperature: ");
+        print(temperature);
+        i = i+1;
+    end
+
+    print("--------------------------------------------------- Pumps from asset model");
+    List<Pump> pumps = assetModel.getPumps(config);
+    lengthPumps = pumps.length();
+    i = 0;
+    while i < lengthPumps do
+        Pump pump = pumps.get(i);
+        print("shelfFloor: ");
+        print(pump.shelfFloor);
+        print(" groupPosition: ");
+        print(pump.groupPosition);
+        Double pumpedWater = pump.getPumpedWater();
+        print(" pumpedWater: ");
+        print(pumpedWater);
+        i = i+1;
+    end
+
+    breakpoint;
+end
+
+
+/**
+* Represents a physical Pot. Should be retrieved from the asset model via AssetModel.getPots()
+* Each pot in the is associated with a moisture sensor.
+*/
+class Pot(Int shelfFloor, String groupPosition, String potPosition)
+    models "rdf:type ast:Pot.";
+
+    // Return last moisture detection for the pot
+    Double getMoisture()
+        // TODO should parameterize query based on shelfFloor, groupPosition, potPosition of the specific instance
+        Double moisture = 0.0;
+        List<Double> influxReturn = null;
+        
+        // uses list because influx queries return lists
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
+                |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
+                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
+                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"));
+        // get first value of list (list contains just one value)
+        moisture = influxReturn.get(0);
+        return moisture;
+    end
+end
+
+
+/**
+* Represents a physical Shelf. Should be retrieved from the asset model via AssetModel.getShelves()
+* Each Shelf is associated with a humidity and a temperature sensors.
+*/
+class Shelf(Int shelfFloor)
+    models "rdf:type ast:Shelf.";
+
+    // Return last humidity detection for the shelf
+    Double getHumidity()
+        Double humidity = 0.0;
+        // TODO: should parameterize query based on shelfFloor of the specific instance
+        List<Double> influxReturn = null;
+        
+        // uses list because influx queries return lists
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:shelf\")
+                |> filter(fn: (r) => r[\"_field\"] == \"humidity\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"));
+        // get first value of list (list contains just one value)
+        humidity = influxReturn.get(0);
+        return humidity;
+    end
+
+    // Return last temperature detection for the shelf
+    Double getTemperature()
+        Double temperature = 0.0;
+        // TODO: should parameterize query based on shelfFloor of the specific instance
+        List<Double> influxReturn = null;
+        
+        // uses list because influx queries return lists
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:shelf\")
+                |> filter(fn: (r) => r[\"_field\"] == \"temperature\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"));
+        // get first value of list (list contains just one value)
+        temperature = influxReturn.get(0);
+        return temperature;
+    end
+end
+
+/**
+* Represents the physical Greenhouse. There is only one instance of it so it should not be retrieved from the asset model.
+* There is a light sensor associated with the whole greenhouse.
+*/
+class Greenhouse
+    models "rdf:type ast:Greenhouse.";
+    // get last light measurement for the greenhouse
+    Double getLight()
+        Double light = null;
+        List<Double> influxReturn = null;
+
+        // get light measurement from influx
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:greenhouse\")
+                |> filter(fn: (r) => r[\"_field\"] == \"light\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+            INFLUXDB("config_local.yml"));
+        light = influxReturn.get(0);
+        return light;
+    end
+end
+
+
+/**
+* Represents a physical Pump. Should be retrieved from the asset model via AssetModel.getPumps()
+* Each Pump is associated with a water pumping sensor.
+*/
+class Pump(Int shelfFloor, Int groupPosition)
+    models "rdf:type ast:Pump.";
+    // get last water level measurement for the pump
+    Double getPumpedWater()
+        Double pumpedWater = null;
+        List<Double> influxReturn = null;
+
+        // get pumped water measurement from influx
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pump\")
+                |> filter(fn: (r) => r[\"_field\"] == \"pumped_water\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+            INFLUXDB("config_local.yml"));
+        pumpedWater = influxReturn.get(0);
+        return pumpedWater;
+    end
+end
+
+/**
+* Retrieves data from the asset model and convert it to SMOL objects
+*/
+class AssetModel()
+    // get pot instances from the asset model
+    List<Pot> getPots()
+        List<Pot> pots = construct("
+        PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+        SELECT ?shelfFloor ?groupPosition ?potPosition
+        WHERE {
+            ?pot rdf:type ast:Pot ;
+                ast:hasShelfFloor ?shelfFloor ;
+                ast:hasGroupPosition ?groupPosition ;
+                ast:hasPotPosition ?potPosition .
+        }");
+        return pots;
+    end
+
+    // get shelf instances from the asset model
+    List<Shelf> getShelves()
+        List<Shelf> shelves = construct("
+            PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+            SELECT ?shelfFloor
+            WHERE {
+                ?shelf rdf:type ast:Shelf ;
+                    ast:hasShelfFloor ?shelfFloor .
+            }
+        ");
+        return shelves;
+    end
+
+    List<Pump> getPumps()
+        List<Pump> pumps = construct("
+            PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+            SELECT ?shelfFloor ?groupPosition
+            WHERE {
+                ?shelf rdf:type ast:Shelf ;
+                    ast:hasShelfFloor ?shelfFloor ;
+                    ast:hasGroupPosition ?groupPosition.
+            }
+        ");
+        return pumps;
+    end
+end
+
+
+class Utils(String config)
+
+end
