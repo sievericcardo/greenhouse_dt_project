@@ -64,7 +64,7 @@ class Utils()
 
         meanMoistureList = access(
         "from(bucket: \"greenhouse_test\")
-            |> range(start: -10d)
+            |> range(start: -30d)
             |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
             |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
             |> filter(fn: (r) => r[\"group_position\"] == \"right\")
