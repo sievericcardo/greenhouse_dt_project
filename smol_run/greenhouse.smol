@@ -7,6 +7,9 @@ main
     String config = "config_local.yml";
 
     AssetModel assetModel = new AssetModel();
+
+
+    // Pot pippoPot = new Pot(1, "armando", "giraudo") models "rdf:type run:pot1 .";
     
     print("--------------------------------------------------- Pots from asset model");
     List<Pot> pots = assetModel.getPots(config);
@@ -65,7 +68,7 @@ end
 
 /**
 * Represents a physical Pot. Should be retrieved from the asset model via AssetModel.getPots()
-* Each pot in the is associated with a moisture sensor.
+* Each pot is associated with a moisture sensor.
 */
 class Pot(Int shelfFloor, String groupPosition, String potPosition)
     models "rdf:type ast:Pot.";
@@ -149,7 +152,7 @@ end
 * Represents the physical Greenhouse. There is only one instance of it so it should not be retrieved from the asset model.
 * There is a light sensor associated with the whole greenhouse.
 */
-class Greenhouse
+class Greenhouse()
     models "rdf:type ast:Greenhouse.";
     // get last light measurement for the greenhouse
     Double getLight()
