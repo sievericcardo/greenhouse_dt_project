@@ -243,8 +243,3 @@ class AssetModel()
         return pumps;
     end
 end
-
-
-class Utils(String config)
-
-end
