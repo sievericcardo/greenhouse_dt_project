@@ -11,7 +11,7 @@ main
 
     // Pot pippoPot = new Pot(1, "armando", "giraudo") models "rdf:type run:pot1 .";
     
-    print("--------------------------------------------------- Pots from asset model");
+    print("--------------------------------------------------- Pots from asset model + influx data");
     List<Pot> pots = assetModel.getPots(config);
     lengthPots = pots.length();
     while i < lengthPots do
@@ -29,7 +29,7 @@ main
     end
     
 
-    print("--------------------------------------------------- Shelves from asset model");
+    print("--------------------------------------------------- Shelves from asset model + influx data");
     List<Shelf> shelves = assetModel.getShelves(config);
     lengthShelves = shelves.length();
     i = 0;
@@ -46,7 +46,7 @@ main
         i = i+1;
     end
 
-    print("--------------------------------------------------- Pumps from asset model");
+    print("--------------------------------------------------- Pumps from asset model + influx data");
     List<Pump> pumps = assetModel.getPumps(config);
     lengthPumps = pumps.length();
     i = 0;
