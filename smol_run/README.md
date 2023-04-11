@@ -28,8 +28,6 @@ For each asset a class is defined
 
 <br>
 
-
-
 ### Pump
 
 > `Pump` represents a pump used to water a group of pots. <br>
