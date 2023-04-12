@@ -235,7 +235,7 @@ class AssetModel()
             PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
             SELECT ?shelfFloor ?groupPosition
             WHERE {
-                ?shelf rdf:type ast:Shelf ;
+                ?pump rdf:type ast:Pump ;
                     ast:hasShelfFloor ?shelfFloor ;
                     ast:hasGroupPosition ?groupPosition.
             }
