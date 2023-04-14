@@ -7,6 +7,9 @@ main
     Utils utils = new Utils();
 
     idealMoisture = utils.getIdealMoisture(1, "right", "left");
+
+    breakpoint;
+    
     meanMoisture = utils.getMeanMoisture(1, "right", "left");
     threshold = 0.0;
     checkWateringNeeded = utils.wateringNeeded(idealMoisture, meanMoisture, threshold);
@@ -32,9 +35,9 @@ class Utils()
         SELECT ?obj
         WHERE {
             ?pot rdf:type ast:Pot ;
-                ast:hasShelfFloor %1 ;
-                ast:hasGroupPosition 'right' ;
-                ast:hasPotPosition 'left' ;
+                ast:hasShelfFloor '%1' ;
+                ast:hasGroupPosition '%2' ;
+                ast:hasPotPosition '%3' ;
                 ast:hasPlant ?plant .
             ?plant ast:hasIdealMoisture ?obj .
         }", shelfFloor, groupPosition, potPosition);
