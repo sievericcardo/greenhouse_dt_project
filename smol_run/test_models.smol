@@ -1,0 +1,8 @@
+main
+    TestClass test = new TestClass();
+    breakpoint;
+end
+
+class TestClass()
+    models "rdf:type domain:Res.";
+end
