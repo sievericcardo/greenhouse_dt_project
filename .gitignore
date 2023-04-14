@@ -2,3 +2,45 @@ smol_runner/.idea/
 smol_run/greenhouse.properties
 smol_run/out/out.ttl
 smol_run/output/out.ttl
+
+
+# .gitignore for Java project using Gradle and IntelliJ
+
+# Gradle specific files
+.gradle/
+build/
+*.iml
+out/
+buildSrc/
+
+# IntelliJ specific files
+.idea/
+*.ipr
+*.iws
+*.iml
+out/
+*.class
+
+# Compiled Java class files
+*.class
+
+# Generated files
+gen/
+gen-*/
+
+# Logs and reports
+logs/
+*.log
+*.txt
+*.html
+*.xml
+*.csv
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# OS-specific files
+Thumbs.db
+.DS_Store
