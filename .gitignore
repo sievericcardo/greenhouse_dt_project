@@ -1,8 +1,10 @@
-smol_runner/.idea/
-smol_run/greenhouse.properties
-smol_run/out/out.ttl
+#smol_run
 smol_run/output/out.ttl
+smol_run/greenhouse.properties
 
+# smol_runner
+smol_runner/src/main/kg_output/
+smol_runner/.idea/
 
 # .gitignore for Java project using Gradle and IntelliJ
 
@@ -17,12 +19,9 @@ buildSrc/
 .idea/
 *.ipr
 *.iws
-*.iml
-out/
 *.class
 
 # Compiled Java class files
-*.class
 
 # Generated files
 gen/
