@@ -7,8 +7,6 @@ main
     Utils utils = new Utils();
 
     idealMoisture = utils.getIdealMoisture(1, "right", "left");
-
-    breakpoint;
     
     meanMoisture = utils.getMeanMoisture(1, "right", "left");
     threshold = 0.0;
@@ -19,9 +17,12 @@ main
     else
         print("I'm ok thank u :-)");
     end
+
+    breakpoint;
 end
 
 class Utils()
+    models 
 
     // get ideal moisture from the asset model of a plant in a specific pot identified by shelfFloor, groupPosition and potPosition
     Double getIdealMoisture(Int shelfFloor, String groupPosition, String potPosition)
@@ -35,14 +36,16 @@ class Utils()
         SELECT ?obj
         WHERE {
             ?pot rdf:type ast:Pot ;
-                ast:hasShelfFloor '%1' ;
-                ast:hasGroupPosition '%2' ;
-                ast:hasPotPosition '%3' ;
+                ast:hasShelfFloor %1 ;
+                ast:hasGroupPosition %2 ;
+                ast:hasPotPosition %3 ;
                 ast:hasPlant ?plant .
             ?plant ast:hasIdealMoisture ?obj .
         }", shelfFloor, groupPosition, potPosition);
 
         length = idealMoistureList.length();
+        print(length);
+        print(" ");
 
         while i < length do
             idealMoisture = idealMoistureList.get(i);
@@ -50,11 +53,10 @@ class Utils()
             print(idealMoisture);
             i = i+1;
         end
+        print(" ");
 
         return idealMoisture;
     end
-
-
 
     /**
     * Queries influxdb to get mean moisture  of a specific pot identified by shelfFloor, groupPosition and potPosition
@@ -70,12 +72,12 @@ class Utils()
             |> range(start: -30d)
             |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
             |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
-            |> filter(fn: (r) => r[\"group_position\"] == \"right\")
-            |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
-            |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+            |> filter(fn: (r) => r[\"group_position\"] == %1)
+            |> filter(fn: (r) => r[\"pot_position\"] == %2)
+            |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
             |> keep(columns: [\"_value\"])
             |> mean(column: \"_value\")",
-        INFLUXDB("config_local.yml"));
+        INFLUXDB("config_local.yml"), groupPosition, potPosition, shelfFloor);
 
         length = meanMoistureList.length();
 
