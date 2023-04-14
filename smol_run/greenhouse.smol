@@ -7,9 +7,6 @@ main
     String config = "config_local.yml";
 
     AssetModel assetModel = new AssetModel();
-
-
-    // Pot pippoPot = new Pot(1, "armando", "giraudo") models "rdf:type run:pot1 .";
     
     print("--------------------------------------------------- Pots from asset model + influx data");
     List<Pot> pots = assetModel.getPots(config);
@@ -71,7 +68,7 @@ end
 * Each pot is associated with a moisture sensor.
 */
 class Pot(Int shelfFloor, String groupPosition, String potPosition)
-    models "rdf:type ast:Pot.";
+    models "rdf:type domain:Pot.";
 
     // Return last moisture detection for the pot
     Double getMoisture()
@@ -103,7 +100,7 @@ end
 * Each Shelf is associated with a humidity and a temperature sensors.
 */
 class Shelf(Int shelfFloor)
-    models "rdf:type ast:Shelf.";
+    models "rdf:type domain:Shelf.";
 
     // Return last humidity detection for the shelf
     Double getHumidity()
@@ -153,7 +150,7 @@ end
 * There is a light sensor associated with the whole greenhouse.
 */
 class Greenhouse()
-    models "rdf:type ast:Greenhouse.";
+    models "rdf:type domain:Greenhouse.";
     // get last light measurement for the greenhouse
     Double getLight()
         Double light = null;
@@ -179,7 +176,7 @@ end
 * Each Pump is associated with a water pumping sensor.
 */
 class Pump(Int shelfFloor, Int groupPosition)
-    models "rdf:type ast:Pump.";
+    models "rdf:type domain:Pump.";
     // get last water level measurement for the pump
     Double getPumpedWater()
         Double pumpedWater = null;
