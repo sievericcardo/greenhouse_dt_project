@@ -1,0 +1,51 @@
+main
+    Double idealMoisture = 0.0;
+    Double meanMoisture = 0.0;
+    List<Double> meanMoistureList = null;
+    List<Double> idealMoistureList = null;
+    Int length = 0; // length of the list returned by the query
+
+    Int shelfFloor = 1;
+
+    String groupPosition = "right";
+    String potPosition = "left";
+
+    idealMoistureList = access(
+    "PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+    SELECT ?obj
+    WHERE {
+        ?pot rdf:type ast:Pot ;
+            ast:hasShelfFloor %1 ;
+            ast:hasGroupPosition %2 ;
+            ast:hasPotPosition %3 ;
+            ast:hasPlant ?plant .
+        ?plant ast:hasIdealMoisture ?obj .
+    }", shelfFloor, groupPosition, potPosition);
+
+    idealMoisture = idealMoistureList.get(0);
+    print("ideal moisture:");
+    print(idealMoisture);
+
+
+    String shelfFloorString = intToString(shelfFloor);
+    print(shelfFloor);
+    print (shelfFloorString);
+
+    meanMoistureList = access(
+        "from(bucket: \"greenhouse_test\")
+            |> range(start: -30d)
+            |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
+            |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
+            |> filter(fn: (r) => r[\"group_position\"] == %1)
+            |> filter(fn: (r) => r[\"pot_position\"] == %2)
+            |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
+            |> keep(columns: [\"_value\"])
+            |> mean(column: \"_value\")",
+        INFLUXDB("config_local.yml"), groupPosition, potPosition, "1");
+
+    meanMoisture = meanMoistureList.get(0);
+    print("mean moisture:");
+    print(meanMoisture);
+
+    breakpoint;
+end
