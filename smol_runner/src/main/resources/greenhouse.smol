@@ -7,14 +7,13 @@ main
     String config = "config_local.yml";
 
     AssetModel assetModel = new AssetModel();
-
-
-    // Pot pippoPot = new Pot(1, "armando", "giraudo") models "rdf:type run:pot1 .";
     
     print("--------------------------------------------------- Pots from asset model + influx data");
     List<Pot> pots = assetModel.getPots(config);
     lengthPots = pots.length();
     while i < lengthPots do
+        print("Pot: ");
+        print(i);
         Pot pot = pots.get(i);
         print("shelfFloor: ");
         print(pot.shelfFloor);
@@ -71,7 +70,6 @@ end
 * Each pot is associated with a moisture sensor.
 */
 class Pot(Int shelfFloor, String groupPosition, String potPosition)
-    models "rdf:type ast:Pot.";
 
     // Return last moisture detection for the pot
     Double getMoisture()
@@ -85,12 +83,15 @@ class Pot(Int shelfFloor, String groupPosition, String potPosition)
                 |> range(start: -30d)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
                 |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
-                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
-                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
-                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> filter(fn: (r) => r[\"group_position\"] == %1)
+                |> filter(fn: (r) => r[\"pot_position\"] == %2)
+                |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"));
+        INFLUXDB("config_local.yml"),
+        this.groupPosition,
+        this.potPosition,
+        this.shelfFloor);
         // get first value of list (list contains just one value)
         moisture = influxReturn.get(0);
         return moisture;
@@ -103,7 +104,6 @@ end
 * Each Shelf is associated with a humidity and a temperature sensors.
 */
 class Shelf(Int shelfFloor)
-    models "rdf:type ast:Shelf.";
 
     // Return last humidity detection for the shelf
     Double getHumidity()
@@ -153,7 +153,6 @@ end
 * There is a light sensor associated with the whole greenhouse.
 */
 class Greenhouse()
-    models "rdf:type ast:Greenhouse.";
     // get last light measurement for the greenhouse
     Double getLight()
         Double light = null;
@@ -179,7 +178,6 @@ end
 * Each Pump is associated with a water pumping sensor.
 */
 class Pump(Int shelfFloor, Int groupPosition)
-    models "rdf:type ast:Pump.";
     // get last water level measurement for the pump
     Double getPumpedWater()
         Double pumpedWater = null;
