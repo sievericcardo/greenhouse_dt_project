@@ -215,6 +215,7 @@ class AssetModel()
                 ast:hasPotPosition ?potPosition .
         }");
         return pots;
+        // edit query to get new pots
     end
 
     // get shelf instances from the asset model
