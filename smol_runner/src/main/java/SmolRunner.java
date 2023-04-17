@@ -20,6 +20,7 @@ public class SmolRunner {
     static boolean useQueryType = false;
 
     public static void main(String[] args) {
+        org.apache.jena.query.ARQ.init();
         Settings settings = getSettings();
 
         REPL repl = new REPL(settings);
@@ -27,7 +28,7 @@ public class SmolRunner {
         repl.command("verbose", "true");
 
         repl.command("read",
-            "src/main/resources/greenhouse.smol");
+            "src/main/resources/test_java_runner.smol");
 
         repl.command("auto", "");
         repl.command("dump", "out.ttl");
