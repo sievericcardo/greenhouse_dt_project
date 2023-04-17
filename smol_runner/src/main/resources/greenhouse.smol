@@ -12,6 +12,8 @@ main
     List<Pot> pots = assetModel.getPots(config);
     lengthPots = pots.length();
     while i < lengthPots do
+        print("Pot: ");
+        print(i);
         Pot pot = pots.get(i);
         print("shelfFloor: ");
         print(pot.shelfFloor);
@@ -81,12 +83,15 @@ class Pot(Int shelfFloor, String groupPosition, String potPosition)
                 |> range(start: -30d)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
                 |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
-                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
-                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
-                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> filter(fn: (r) => r[\"group_position\"] == %1)
+                |> filter(fn: (r) => r[\"pot_position\"] == %2)
+                |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"));
+        INFLUXDB("config_local.yml"),
+        this.groupPosition,
+        this.potPosition,
+        this.shelfFloor);
         // get first value of list (list contains just one value)
         moisture = influxReturn.get(0);
         return moisture;

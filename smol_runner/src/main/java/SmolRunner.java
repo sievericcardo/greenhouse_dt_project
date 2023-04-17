@@ -17,8 +17,11 @@ public class SmolRunner {
 
         repl.command("verbose", "true");
 
+        // TODO run test on test_influx_connection.smol
+        // maybe SMOLRunner should take a path to a smol file as an argument instead of hardcoding it
+
         repl.command("read",
-            "src/main/resources/test_java_runner.smol");
+            "src/main/resources/greenhouse.smol");
 
         repl.command("auto", "");
         repl.command("dump", "out.ttl");
