@@ -22,7 +22,6 @@ main
 end
 
 class Utils()
-    models 
 
     // get ideal moisture from the asset model of a plant in a specific pot identified by shelfFloor, groupPosition and potPosition
     Double getIdealMoisture(Int shelfFloor, String groupPosition, String potPosition)

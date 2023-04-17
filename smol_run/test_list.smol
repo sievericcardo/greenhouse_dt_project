@@ -1,0 +1,8 @@
+main
+    Int length = 0;
+    List<Int> list = new List(5, null);
+    List<Int> list2 = new List(5, list);
+
+    length = list2.length();
+    print(length);
+end
