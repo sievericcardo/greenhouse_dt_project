@@ -8,16 +8,6 @@ import java.nio.file.Files;
 import java.util.HashMap;
 
 public class SmolRunner {
-    static boolean verbose = true;
-    static boolean materialize = false;
-    static String kgOutput = "src/main/kg_output/";
-    static String greenhouseAssetModel = "src/main/resources/greenhouse.ttl";
-    static String domainPrefix = "http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#";
-    static String progPrefix = "https://github.com/Edkamb/SemanticObjects/Program#";
-    static String runPrefix = "https://github.com/Edkamb/SemanticObjects/Run" + System.currentTimeMillis() + "#";
-    static String langPrefix = "https://github.com/Edkamb/SemanticObjects#";
-    static HashMap<String, String> extraPrefixes = new HashMap<>();
-    static boolean useQueryType = false;
 
     public static void main(String[] args) {
         org.apache.jena.query.ARQ.init();
@@ -36,26 +26,37 @@ public class SmolRunner {
 
     @NotNull
     private static Settings getSettings() {
-        String assetModel = getAssetModel();
+        boolean verbose = true;
+        boolean materialize = false;
+        String kgOutput = "src/main/kg_output/";
+        String greenhouseAssetModel = "src/main/resources/greenhouse.ttl";
+        String domainPrefix = "http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#";
+        String progPrefix = "https://github.com/Edkamb/SemanticObjects/Program#";
+        String runPrefix = "https://github.com/Edkamb/SemanticObjects/Run" + System.currentTimeMillis() + "#";
+        String langPrefix = "https://github.com/Edkamb/SemanticObjects#";
+        HashMap<String, String> extraPrefixes = new HashMap<>();
+        boolean useQueryType = false;
+
+        String assetModel = getAssetModel(greenhouseAssetModel);
 
         return new Settings(
-            SmolRunner.verbose,
-            SmolRunner.materialize,
-            SmolRunner.kgOutput,
+            verbose,
+            materialize,
+            kgOutput,
             assetModel,
-            SmolRunner.domainPrefix,
-            SmolRunner.progPrefix,
-            SmolRunner.runPrefix,
-            SmolRunner.langPrefix,
-            SmolRunner.extraPrefixes,
-            SmolRunner.useQueryType
+            domainPrefix,
+            progPrefix,
+            runPrefix,
+            langPrefix,
+            extraPrefixes,
+            useQueryType
         );
     }
 
-    private static String getAssetModel() {
-        // Read the asset model from the file in SmolRunner.greenhouseAssetModel
+    private static String getAssetModel(String assetModel) {
+        // Read the asset model from the file
         try {
-            return Files.readString(new File(SmolRunner.greenhouseAssetModel).toPath());
+            return Files.readString(new File(assetModel).toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
