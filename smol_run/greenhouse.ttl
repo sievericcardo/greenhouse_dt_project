@@ -177,9 +177,9 @@ ast:hasShelfFloor rdf:type owl:DatatypeProperty ;
                               ast:Shelf ;
                   rdfs:range [ rdf:type rdfs:Datatype ;
                                owl:oneOf [ rdf:type rdf:List ;
-                                           rdf:first 1 ;
+                                           rdf:first "1" ;
                                            rdf:rest [ rdf:type rdf:List ;
-                                                      rdf:first 2 ;
+                                                      rdf:first "2" ;
                                                       rdf:rest rdf:nil
                                                     ]
                                          ]
@@ -347,12 +347,14 @@ ast:potGroup1 rdf:type owl:NamedIndividual ,
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#shelf1
 ast:shelf1 rdf:type owl:NamedIndividual ,
-                    ast:Shelf .
+                    ast:Shelf ;
+           ast:hasShelfFloor "1"^^xsd:string .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#shelf2
 ast:shelf2 rdf:type owl:NamedIndividual ,
-                    ast:Shelf .
+                    ast:Shelf ;
+           ast:hasShelfFloor "2"^^xsd:string .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#waterTank
