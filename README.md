@@ -8,7 +8,7 @@ Repository containing other repositories related to the greenhouse digital twin 
 - [Project Architecture](#project-architecture)
     - [Physical Architecture](#physical-architecture)
         - [Greenhouse](#greenhouse)
-        - [Sensors](#sensors)
+        - [Sensors](#assets---sensors)
         - [Data collectors](#data-collectors)
         - [Host computer](#host-computer)
     - [Tools Overview](#tools-overview)
@@ -55,4 +55,66 @@ The primary objective of this research project is to create a functional example
 
 In this report, we will provide a detailed overview of the methodology used to develop the digital twin, present the results of our data analysis, discuss the implications of our findings, and highlight the potential applications of digital twins in various fields beyond agriculture. This research contributes to the growing body of knowledge on digital twins and serves as a practical example of their application in a real-world setting.
 
+## Project Architecture
+
+### Physical Architecture
+
+#### Greenhouse
+The specific greenhouse we are working with has the following characteristics:
+- The greenhouse is divided in two shelves.
+- Each shelf is composed by 2 groups of plants.
+- Each group of plants is watered by a water pump.
+- Each group of plants is composed by 2 plants.
+- Each plant is put inside a pot.
+
+#### Assets - Sensors
+Here is a list of assets we are representing for our architecture, along with the sensors we are using to collect data on them:
+
+- Greenhouse
+  - <!-- Put sensor names for each sensor --> Light
+- Shelves
+  - Temperature
+  - Air Humidity
+- Pots
+  - Soil Moisture
+- Plants
+  - Camera (measures plant health and growth)
+- Water pumps
+  - Water flow
+
+#### Data collectors
+The data collectors are the Raspberry Pi that are collecting data from the sensors and sending them to the host computer.
+They run a Python program that collects data from the sensors and sends them to the host computer.
+Each data collector is connected to a greenhouse shelf and is responsible for collecting data on the assets that are 
+located on that shelf (1 shelf, 4 pots, 4 plants, 2 water pumps).
+
+#### Host computer
+The host computer is the computer that is running the InfluxDB database and the SMOL program.
+The host computer is responsible for storing the data collected by the data collectors and for running the SMOL program 
+that is responsible for creating the digital twin of the greenhouse.
+
+### Tools Overview
+
+#### InfluxDB
+InfluxDB is a time-series database that is used to store the data collected by the data collectors.
+There is a single bucket in the database that is used to store all the data collected by the data collectors.
+Measurements from different assets have their own measurement name in the database. 
+Each measurement has a set of fields that represent the data collected by the sensors, related to that asset.
+
+#### Python influxdb-client
+The Python influxdb-client is a Python library that is used to interact with the InfluxDB database.
+It is used by the data collectors to send data to the database.
+
+#### Python sensors libraries
+
+#### OWL
+OWL is a knowledge representation language that is used to represent the asset model of the greenhouse.
+The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships 
+between them.
+
+#### SMOL
+SMOL is an object-oriented language that is used to connect the asset model to the data collected by the data 
+collectors.
+It is used to generate the semantic lifting of the program state, which is then used to create the digital twin of the
+greenhouse.
 
