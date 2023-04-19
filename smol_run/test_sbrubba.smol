@@ -6,9 +6,11 @@ main
     Int length = 0; // length of the list returned by the query
 
     Int shelfFloor = 1;
+    
 
     String groupPosition = "right";
     String potPosition = "left";
+    
 
     idealMoistureList = access(
     "PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
@@ -41,7 +43,7 @@ main
             |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
             |> keep(columns: [\"_value\"])
             |> mean(column: \"_value\")",
-        INFLUXDB("config_local.yml"), groupPosition, potPosition, "1");
+        INFLUXDB("config_local.yml"), groupPosition, potPosition, shelfFloorString);
 
     meanMoisture = meanMoistureList.get(0);
     print("mean moisture:");

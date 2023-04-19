@@ -1,8 +1,15 @@
 main
+    Int i = 0;
     Int length = 0;
     List<Int> list = new List(5, null);
     List<Int> list2 = new List(5, list);
 
     length = list2.length();
     print(length);
+
+    while i < length do
+        Int value = list2.get(i);
+        print(value);
+        i = i + 1;
+    end
 end
