@@ -2,13 +2,27 @@ main
     Int lengthPots = 0;
     Int lengthShelves = 0;
     Int lengthPumps = 0;
+    Int lengthPlants = 0;
     Int i = 0;
 
     String config = "config_local.yml";
 
     AssetModel assetModel = new AssetModel();
+
+    /*
+    String groupPosition = "right";
+    String potPosition = "left";
+    Int shelfFloor = 1;
+    // String shelfFloorString = intToString(shelfFloor);
+    String shelfFloorString = "1";
+    Pot pot1 = new Pot(shelfFloorString, groupPosition, potPosition);
+    Double moisture = pot1.getMoisture();
+    print(moisture);
+    */
+    
     
     print("--------------------------------------------------- Pots from asset model + influx data");
+
     List<Pot> pots = assetModel.getPots(config);
     lengthPots = pots.length();
     while i < lengthPots do
@@ -177,10 +191,11 @@ class Shelf(String shelfFloor)
                 |> range(start: -30d)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:shelf\")
                 |> filter(fn: (r) => r[\"_field\"] == \"humidity\")
-                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"));
+        INFLUXDB("config_local.yml"),
+        this.shelfFloor);
         // get first value of list (list contains just one value)
         humidity = influxReturn.get(0);
         return humidity;
@@ -198,10 +213,11 @@ class Shelf(String shelfFloor)
                 |> range(start: -30d)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:shelf\")
                 |> filter(fn: (r) => r[\"_field\"] == \"temperature\")
-                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"));
+        INFLUXDB("config_local.yml"),
+        this.shelfFloor);
         // get first value of list (list contains just one value)
         temperature = influxReturn.get(0);
         return temperature;
@@ -249,9 +265,13 @@ class Pump(String shelfFloor, String groupPosition)
                 |> range(start: -30d)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pump\")
                 |> filter(fn: (r) => r[\"_field\"] == \"pumped_water\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
+                |> filter(fn: (r) => r[\"group_position\"] == %2)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-            INFLUXDB("config_local.yml"));
+            INFLUXDB("config_local.yml"),
+            this.shelfFloor,
+            this.groupPosition);
         pumpedWater = influxReturn.get(0);
         return pumpedWater;
     end
