@@ -12,6 +12,8 @@ main
     List<Pot> pots = assetModel.getPots(config);
     lengthPots = pots.length();
     while i < lengthPots do
+        print("Pot: ");
+        print(i);
         Pot pot = pots.get(i);
         print("shelfFloor: ");
         print(pot.shelfFloor);
@@ -24,8 +26,24 @@ main
         print(moisture);
         i = i+1;
     end
-    
 
+    print("--------------------------------------------------- Plants from asset model + influx data");
+    List<Plant> plants = assetModel.getPlants(config);
+    lengthPlants = plants.length();
+    i = 0;
+    while i < lengthPlants do
+        Plant plant = plants.get(i);
+        print("plantId: ");
+        print(plant.plantId);
+        Double healthState = plant.getHealthState();
+        print(" healthState: ");
+        print(healthState);
+        Double growthState = plant.getGrowthState();
+        print(" growthState: ");
+        print(growthState);
+        i = i+1;
+    end
+    
     print("--------------------------------------------------- Shelves from asset model + influx data");
     List<Shelf> shelves = assetModel.getShelves(config);
     lengthShelves = shelves.length();
@@ -62,13 +80,56 @@ main
     breakpoint;
 end
 
+/**
+* Represents a physical Plant. Should be retrieved from the asset model via AssetModel.getPlants()
+* Each plant is contained in a Pot. The Pot contains the information about which plant contains.
+*/
+class Plant(String plantId)
+    Double getHealthState()
+        Double healthState = 0.0;
+        List<Double> influxReturn = null;
+
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:plant\")
+                |> filter(fn: (r) => r[\"_field\"] == \"health_state\")
+                |> filter(fn: (r) => r[\"plant_id\"] == %1)
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"),
+        this.plantId);
+
+        healthState = influxReturn.get(0);
+        return healthState;
+    end
+
+    Double getGrowthState()
+        Double growthState = 0.0;
+        List<Double> influxReturn = null;
+
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:plant\")
+                |> filter(fn: (r) => r[\"_field\"] == \"growth_state\")
+                |> filter(fn: (r) => r[\"plant_id\"] == %1)
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"),
+        this.plantId);
+
+        growthState = influxReturn.get(0);
+        return growthState;
+    end
+end
+
 
 /**
 * Represents a physical Pot. Should be retrieved from the asset model via AssetModel.getPots()
 * Each pot is associated with a moisture sensor.
 */
-class Pot(Int shelfFloor, String groupPosition, String potPosition)
-    models "rdf:type domain:Pot.";
+class Pot(String shelfFloor, String groupPosition, String potPosition)
 
     // Return last moisture detection for the pot
     Double getMoisture()
@@ -82,12 +143,15 @@ class Pot(Int shelfFloor, String groupPosition, String potPosition)
                 |> range(start: -30d)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
                 |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
-                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
-                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
-                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> filter(fn: (r) => r[\"group_position\"] == %1)
+                |> filter(fn: (r) => r[\"pot_position\"] == %2)
+                |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"));
+        INFLUXDB("config_local.yml"),
+        this.groupPosition,
+        this.potPosition,
+        this.shelfFloor);
         // get first value of list (list contains just one value)
         moisture = influxReturn.get(0);
         return moisture;
@@ -99,8 +163,7 @@ end
 * Represents a physical Shelf. Should be retrieved from the asset model via AssetModel.getShelves()
 * Each Shelf is associated with a humidity and a temperature sensors.
 */
-class Shelf(Int shelfFloor)
-    models "rdf:type domain:Shelf.";
+class Shelf(String shelfFloor)
 
     // Return last humidity detection for the shelf
     Double getHumidity()
@@ -150,7 +213,6 @@ end
 * There is a light sensor associated with the whole greenhouse.
 */
 class Greenhouse()
-    models "rdf:type domain:Greenhouse.";
     // get last light measurement for the greenhouse
     Double getLight()
         Double light = null;
@@ -175,8 +237,7 @@ end
 * Represents a physical Pump. Should be retrieved from the asset model via AssetModel.getPumps()
 * Each Pump is associated with a water pumping sensor.
 */
-class Pump(Int shelfFloor, Int groupPosition)
-    models "rdf:type domain:Pump.";
+class Pump(String shelfFloor, String groupPosition)
     // get last water level measurement for the pump
     Double getPumpedWater()
         Double pumpedWater = null;
@@ -212,6 +273,7 @@ class AssetModel()
                 ast:hasPotPosition ?potPosition .
         }");
         return pots;
+        // edit query to get new pots
     end
 
     // get shelf instances from the asset model
@@ -238,5 +300,17 @@ class AssetModel()
             }
         ");
         return pumps;
+    end
+
+    List<Plant> getPlants()
+        List<Plant> plants = construct("
+            PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+            SELECT ?plantId
+            WHERE {
+                ?plant rdf:type ast:Plant ;
+                    ast:hasPlantId ?plantId .
+            }
+        ");
+        return plants;
     end
 end
