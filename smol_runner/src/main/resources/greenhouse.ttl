@@ -337,7 +337,7 @@ ast:pot1 rdf:type owl:NamedIndividual ,
          ast:hasPlant ast:basilicum1 ;
          ast:hasGroupPosition "right" ;
          ast:hasPotPosition "left" ;
-         ast:hasShelfFloor 1 .
+         ast:hasShelfFloor "1"^^xsd:string .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#potGroup1
