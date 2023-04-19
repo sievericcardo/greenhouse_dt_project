@@ -6,8 +6,6 @@ main
     Int length = 0; // length of the list returned by the query
 
     Int shelfFloor = 1;
-    
-
     String groupPosition = "right";
     String potPosition = "left";
     
