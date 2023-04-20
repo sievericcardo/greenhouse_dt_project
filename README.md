@@ -43,9 +43,9 @@ Repository containing other repositories related to the greenhouse digital twin 
 
 <!-- For reports also: results, discussion, conclusion -->
 
+<br>
 
-
-## Project Overview
+## <center>Project Overview
 Digital twins have emerged as a promising technology that enables virtual replicas of physical assets, allowing for real-time monitoring, analysis, and simulation. These virtual replicas can be applied across various fields, including agriculture, manufacturing, healthcare, and more. In this research project, our focus is on building a digital twin for a greenhouse as an example to showcase the capabilities of this technology.
 
 Our approach involves developing a digital twin for a greenhouse using a combination of Python programming, SMOL language, and Raspberry Pi. <br>
@@ -55,11 +55,14 @@ The primary objective of this research project is to create a functional example
 
 In this report, we will provide a detailed overview of the methodology used to develop the digital twin, present the results of our data analysis, discuss the implications of our findings, and highlight the potential applications of digital twins in various fields beyond agriculture. This research contributes to the growing body of knowledge on digital twins and serves as a practical example of their application in a real-world setting.
 
-## Project Architecture
+<br>
 
-### Physical Architecture
+## <center>Project Architecture
 
-#### Greenhouse
+
+### **Physical Architecture**
+
+#### **Greenhouse**
 The specific greenhouse we are working with has the following characteristics:
 - The greenhouse is divided in two shelves.
 - Each shelf is composed by 2 groups of plants.
@@ -67,7 +70,7 @@ The specific greenhouse we are working with has the following characteristics:
 - Each group of plants is composed by 2 plants.
 - Each plant is put inside a pot.
 
-#### Assets - Sensors
+#### **Assets - Sensors**
 Here is a list of assets we are representing for our architecture, along with the sensors we are using to collect data on them:
 
 - Greenhouse
@@ -82,39 +85,58 @@ Here is a list of assets we are representing for our architecture, along with th
 - Water pumps
   - Water flow
 
-#### Data collectors
+#### **Data collectors**
 The data collectors are the Raspberry Pi that are collecting data from the sensors and sending them to the host computer.
-They run a Python program that collects data from the sensors and sends them to the host computer.
-Each data collector is connected to a greenhouse shelf and is responsible for collecting data on the assets that are 
-located on that shelf (1 shelf, 4 pots, 4 plants, 2 water pumps).
+They run a Python program that periodically collects data from the sensors and sends them to the host computer.
+Each data collector is related to a greenhouse shelf and is responsible for collecting data on the assets that are located on that shelf (1 shelf, 4 pots, 4 plants, 2 water pumps).
 
-#### Host computer
+#### **Host computer**
 The host computer is the computer that is running the InfluxDB database and the SMOL program.
-The host computer is responsible for storing the data collected by the data collectors and for running the SMOL program 
-that is responsible for creating the digital twin of the greenhouse.
+The host computer is responsible for storing in influxDB the data collected by the data collectors and for running the SMOL program that is responsible for creating the digital twin of the greenhouse.
+<!-- When we know: add also responsible for simulations (modelica) -->
 
-### Tools Overview
+<br>
 
-#### InfluxDB
-InfluxDB is a time-series database that is used to store the data collected by the data collectors.
+### **Tools Overview**
+
+#### **InfluxDB**
+[InfluxDB](https://www.influxdata.com/products/influxdb-overview/) is a time-series database that is used to store the data collected by the data collectors.<br>
+It is composed by buckets which contains measurements.
+Each measurement is composed by:
+- measurement name
+- tags
+  - Used as keys by us to identify the data
+- fields
+  - Used by us to store the actual data from sensors
+- timestamp
+
+and represents a single data point in a specific time.<br>
+This particular structure allows to get data for a specific time range and perform aggregations on it (e.g. mean) <br>
+
+<!--
+TO ADD IN ANOTHER SECTION
 There is a single bucket in the database that is used to store all the data collected by the data collectors.
 Measurements from different assets have their own measurement name in the database. 
-Each measurement has a set of fields that represent the data collected by the sensors, related to that asset.
+Each measurement has a set of fields that represent the data collected by the sensors, related to that asset. -->
 
-#### Python influxdb-client
-The Python influxdb-client is a Python library that is used to interact with the InfluxDB database.
-It is used by the data collectors to send data to the database.
+#### **Python influxdb-client**
+The [Python influxdb-client](https://influxdb-client.readthedocs.io/en/latest/) is a Python library that is used to interact with the InfluxDB database.<br>
+It is used by the data collectors to send data to the influxDB instance running in the host computer.
 
-#### Python sensors libraries
+#### **Python sensors libraries**
+@eduardz1
 
-#### OWL
-OWL is a knowledge representation language that is used to represent the asset model of the greenhouse.
-The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships 
-between them.
 
-#### SMOL
-SMOL is an object-oriented language that is used to connect the asset model to the data collected by the data 
-collectors.
-It is used to generate the semantic lifting of the program state, which is then used to create the digital twin of the
-greenhouse.
+#### **OWL**
+[OWL](https://www.w3.org/TR/owl-ref/) is a knowledge representation language that is used to represent the asset model of the greenhouse. In other words is used to create a formal representation of the greenhouse physical structure.<br>
+The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships between them.
+
+#### **SMOL**
+[SMOL](https://smolang.org/) (Semantic Modeling Object Language) is an object-oriented language that, among others, allows to
+- Interact with influxDB to read data from the database
+- Read and query a knowlegde graph, mapping the data read to objects in the language
+- Map the whole program state to a knowledge graph by mean of the *semantic lifting*. The program state can then be queried to extract information
+- Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
+
+In our case it is used to connect the asset model to the data collected by the data collectors, perform the semantic lifting of the program state and interact with simulations to create the digital twin of the greenhouse.
 
