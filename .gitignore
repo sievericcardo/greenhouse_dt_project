@@ -43,3 +43,4 @@ logs/
 # OS-specific files
 Thumbs.db
 .DS_Store
+.vscode/settings.json
