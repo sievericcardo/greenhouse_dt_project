@@ -16,6 +16,7 @@ out/
 buildSrc/
 
 # IntelliJ specific files
+SemanticObjects/.idea
 .idea/
 *.ipr
 *.iws
