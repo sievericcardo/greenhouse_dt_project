@@ -21,6 +21,9 @@ buildSrc/
 *.iws
 *.class
 
+# VS Code specific files
+.vscode/
+
 # Compiled Java class files
 
 # Generated files
@@ -43,4 +46,3 @@ logs/
 # OS-specific files
 Thumbs.db
 .DS_Store
-.vscode/settings.json
