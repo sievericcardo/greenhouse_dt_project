@@ -8,17 +8,6 @@ main
     String config = "config_local.yml";
 
     AssetModel assetModel = new AssetModel();
-
-    /*
-    String groupPosition = "right";
-    String potPosition = "left";
-    Int shelfFloor = 1;
-    // String shelfFloorString = intToString(shelfFloor);
-    String shelfFloorString = "1";
-    Pot pot1 = new Pot(shelfFloorString, groupPosition, potPosition);
-    Double moisture = pot1.getMoisture();
-    print(moisture);
-    */
     
     
     print("--------------------------------------------------- Pots from asset model + influx data");
@@ -152,6 +141,8 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
         List<Double> influxReturn = null;
         
         // uses list because influx queries return lists
+        
+        
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -166,6 +157,24 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
         this.groupPosition,
         this.potPosition,
         this.shelfFloor);
+        
+
+        /*
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
+                |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
+                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
+                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"));
+        */
+
+        Int length = influxReturn.length();
+        print(length);
         // get first value of list (list contains just one value)
         moisture = influxReturn.get(0);
         return moisture;

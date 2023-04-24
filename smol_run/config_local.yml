@@ -1,4 +1,5 @@
 url: http://localhost:8086
-token: Z6A31OGXjAxLM6Fd4iR8o6K2jU5Ns55Z2PWddoT6801zN9Enc0fzg52tnM4JRUii9au_mGYRQ6vhH0s4osjYmA==
+token: BN0HsJnDS0pEM20xYY1m0Omq4DbpwNPN-o5hxtyGhWEP95F3ryt0d9VyefOMPhUhXakd2cOGDECJjonRzRUFrg==
 org: sirius_local
-bucket: greenhouse
+bucket: greenhouse_test
+
