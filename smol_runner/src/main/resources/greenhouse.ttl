@@ -228,7 +228,13 @@ ast:Greenhouse rdf:type owl:Class ;
                                                       ]
                                                     ) ;
                                  rdf:type owl:Class
-                               ] .
+                               ] ;
+               owl:disjointWith ast:Plant ,
+                                ast:Pot ,
+                                ast:PotGroup ,
+                                ast:Pump ,
+                                ast:Shelf ,
+                                ast:WaterTank .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#Pepper
@@ -250,6 +256,11 @@ ast:Plant rdf:type owl:Class ;
                             owl:onProperty ast:hasIdealMoisture ;
                             owl:someValuesFrom xsd:int
                           ] ;
+          owl:disjointWith ast:Pot ,
+                           ast:PotGroup ,
+                           ast:Pump ,
+                           ast:Shelf ,
+                           ast:WaterTank ;
           owl:hasKey ( ast:hasPlantId
                      ) .
 
@@ -264,7 +275,11 @@ ast:Pot rdf:type owl:Class ;
                         [ rdf:type owl:Restriction ;
                           owl:onProperty ast:hasMoisture ;
                           owl:someValuesFrom xsd:int
-                        ] .
+                        ] ;
+        owl:disjointWith ast:PotGroup ,
+                         ast:Pump ,
+                         ast:Shelf ,
+                         ast:WaterTank .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#PotGroup
@@ -281,7 +296,10 @@ ast:PotGroup rdf:type owl:Class ;
                                                     ]
                                                   ) ;
                                rdf:type owl:Class
-                             ] .
+                             ] ;
+             owl:disjointWith ast:Pump ,
+                              ast:Shelf ,
+                              ast:WaterTank .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#Pump
@@ -289,7 +307,9 @@ ast:Pump rdf:type owl:Class ;
          rdfs:subClassOf [ rdf:type owl:Restriction ;
                            owl:onProperty ast:hasWaterFlow ;
                            owl:someValuesFrom xsd:int
-                         ] .
+                         ] ;
+         owl:disjointWith ast:Shelf ,
+                          ast:WaterTank .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#Shelf
@@ -301,7 +321,8 @@ ast:Shelf rdf:type owl:Class ;
                           [ rdf:type owl:Restriction ;
                             owl:onProperty ast:hasTemperature ;
                             owl:someValuesFrom xsd:double
-                          ] .
+                          ] ;
+          owl:disjointWith ast:WaterTank .
 
 
 ###  http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#WaterTank
