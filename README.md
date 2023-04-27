@@ -131,7 +131,7 @@ It is used by the data collectors to send data to the influxDB instance running 
 [OWL](https://www.w3.org/TR/owl-ref/) is a knowledge representation language that is used to represent the asset model of the greenhouse. In other words is used to create a formal representation of the greenhouse physical structure.<br>
 The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships between them.
 
-#### **SMOL**
+#### **SMOL Language**
 [SMOL](https://smolang.org/) (Semantic Modeling Object Language) is an object-oriented language that, among others, allows to
 - Interact with influxDB to read data from the database
 - Read and query a knowlegde graph, mapping the data read to objects in the language
@@ -139,4 +139,42 @@ The asset model is used to represent the assets described in [Assets - Sensors](
 - Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
 
 In our case it is used to connect the asset model to the data collected by the data collectors, perform the semantic lifting of the program state and interact with simulations to create the digital twin of the greenhouse.
+
+### **Project Components**
+
+#### **Sensors**
+@eduardz1
+
+#### **Python sensor-data controller**
+Python program that is run on the data collectors and is responsible for collecting data from the sensors and sending them to the host computer.
+
+It achieves this by:
+- A virtual representation of the various assets in the greenhouse is created (E.g. Plants in the greenhouse).
+- Each virtual asset is connected to a set of physical sensors (Eg. Virtual plants are connected to the appropriate camera that retrieves plant health and growth).
+- Virtual assets periodically collect data from the sensors, create a data point containing the asset identifiers and the sensors detection and send it to the host computer.
+
+### **Greenhouse Asset Model**
+
+The Greenhouse Asset Model is an OWL representation of the physical structure of the greenhouse and the relationships between the various assets in the greenhouse.
+
+The asset model individuals are used by the SMOL program as a starting point for twinning the greenhouse.
+
+Here follows a picture of the asset model:
+<!-- TODO: add picture of asset model -->
+
+### **Twinning the Greenhouse with SMOL**
+
+The SMOL program is run by the host computer and is responsible for creating the digital twin of the greenhouse.
+
+It achieves this by:
+- Reads the asset model from the OWL file
+- Generates SMOL objects from the asset model individuals
+- For each asset object, retrieves sensor detections for that specific asset from the influxDB database (E.g. Retrieve moisture data for a specific pot).
+- After retrieving the data, the program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse. 
+
+### **Scheduled run using Java**
+
+The SMOL program is run periodically by the host computer to retrieve the digital shadow of the greenhouse.
+A simple Java program is used to schedule the execution of the SMOL program.
+
 
