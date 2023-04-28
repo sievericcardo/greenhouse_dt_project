@@ -8,7 +8,7 @@ Repository containing other repositories related to the greenhouse digital twin 
 - [Project Architecture](#project-architecture)
     - [Physical Architecture](#physical-architecture)
         - [Greenhouse](#greenhouse)
-        - [Sensors](#assets---sensors)
+        - [Assets - Sensors](#assets---sensors)
         - [Data collectors](#data-collectors)
         - [Host computer](#host-computer)
     - [Tools Overview](#tools-overview)
@@ -17,35 +17,23 @@ Repository containing other repositories related to the greenhouse digital twin 
         - [Python sensors libraries](#python-sensors-libraries)
         - [OWL](#owl)
         - [SMOL language](#smol-language)
-    - [Project Components](#project-components)
-        - [Sensors](#sensors)
-        - [Python sensor-data controller](#python-sensor-data-controller)
-            - [Sensor controller](#sensor-controller)
-            - [InfluxDB controller](#influxdb-controller)
+    - [Software Components](#software-components)
+        - [Sensors Scripts](#sensors-scripts)
+        - [Data Collectors Python program](#data-collectors-python-program)
         - [Greenhouse asset model](#greenhouse-asset-model)
-        - [Twinning the greenhouse with SMOL](#twinning-the-greenhouse-with-smol)
-        - [Scheduled run using Java](#scheduled-runner-using-java)
+        - [SMOL Twinning program](#smol-twinning-program)
+        - [SMOL scheduler](#SMOL-scheduler)
     - [Execution flow](#execution-flow)
 - [Project setup](#project-setup)
-    - [Raspberry Pi](#raspberry-pi-setup)
-        - [Sensor connections](#raspberry-pi-sensor-connections)
-        - [Software](#raspberry-pi-software-setup)
-    - [InfluxDB](#influxdb-setup)
-    - [Python](#python-setup)
-    - [SMOL](#smol-setup)
-    <!-- - [Java](#java-setup) -->
-    - [Host computer](#host-computer-setup)
+    - [Data Controllers](#data-collectors-setup)
+    - [Host Computer](#host-computer-setup)
 - [How to run](#how-to-run)
-    - [Data collectors](#data-collectors-run)
-    - [Host computer](#host-computer-run)
-        - [InfluxDB](#influxdb-run)
-        - [Java SMOL runner](#java-smol-runner-run)
 
 <!-- For reports also: results, discussion, conclusion -->
 
 <br>
 
-## <center>Project Overview
+## Project Overview
 Digital twins have emerged as a promising technology that enables virtual replicas of physical assets, allowing for real-time monitoring, analysis, and simulation. These virtual replicas can be applied across various fields, including agriculture, manufacturing, healthcare, and more. In this research project, our focus is on building a digital twin for a greenhouse as an example to showcase the capabilities of this technology.
 
 Our approach involves developing a digital twin for a greenhouse using a combination of Python programming, SMOL language, and Raspberry Pi. <br>
@@ -57,7 +45,7 @@ In this report, we will provide a detailed overview of the methodology used to d
 
 <br>
 
-## <center>Project Architecture
+## Project Architecture
 
 
 ### **Physical Architecture**
@@ -86,13 +74,15 @@ Here is a list of assets we are representing for our architecture, along with th
   - Water flow
 
 #### **Data collectors**
-The data collectors are the Raspberry Pi that are collecting data from the sensors and sending them to the host computer.
-They run a Python program that periodically collects data from the sensors and sends them to the host computer.
-Each data collector is related to a greenhouse shelf and is responsible for collecting data on the assets that are located on that shelf (1 shelf, 4 pots, 4 plants, 2 water pumps).
+The data collectors are Raspberry Pi devices that collect data from the sensors and send it to the DB.
+Each data collector is associated to a greenhouse shelf and is responsible for collecting data on the assets that are located on that shelf (1 shelf, 4 pots, 4 plants, 2 water pumps).
 
 #### **Host computer**
-The host computer is the computer that is running the InfluxDB database and the SMOL program.
-The host computer is responsible for storing in influxDB the data collected by the data collectors and for running the SMOL program that is responsible for creating the digital twin of the greenhouse.
+The host computer runs
+- An InfluxDB instance that holds data retrieved from the [Data Collectors](#data-collectors) 
+- A [Java program](#smol-scheduler) that periodically executes the [SMOL Twinning program](#smol-twinning-program), which is responsible for creating the digital twin of the greenhouse.
+
+The user can interact with the digital twin though the host computer.
 <!-- When we know: add also responsible for simulations (modelica) -->
 
 <br>
@@ -134,23 +124,23 @@ The asset model is used to represent the assets described in [Assets - Sensors](
 #### **SMOL Language**
 [SMOL](https://smolang.org/) (Semantic Modeling Object Language) is an object-oriented language that, among others, allows to
 - Interact with influxDB to read data from the database
-- Read and query a knowlegde graph, mapping the data read to objects in the language
+- Read and query a knowledge graph, mapping the data read to objects in the language
 - Map the whole program state to a knowledge graph by mean of the *semantic lifting*. The program state can then be queried to extract information
 - Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
 
 In our case it is used to connect the asset model to the data collected by the data collectors, perform the semantic lifting of the program state and interact with simulations to create the digital twin of the greenhouse.
 
-### **Project Components**
+### **Software Components**
 
-#### **Sensors**
+#### **Sensors Scripts**
 @eduardz1
 
-#### **Python sensor-data controller**
-Python program that is run on the data collectors and is responsible for collecting data from the sensors and sending them to the host computer.
+#### **Data collectors Python program**
+Python program that is run on the data collectors and is responsible for collecting data from the sensors and sending them to the influxDB instance on the host computer.
 
 It achieves this by:
 - A virtual representation of the various assets in the greenhouse is created (E.g. Plants in the greenhouse).
-- Each virtual asset is connected to a set of physical sensors (Eg. Virtual plants are connected to the appropriate camera that retrieves plant health and growth).
+- Each virtual asset is connected to a set of physical sensors (E.g. Virtual plants are connected to the appropriate camera that retrieves plant health and growth).
 - Virtual assets periodically collect data from the sensors, create a data point containing the asset identifiers and the sensors detection and send it to the host computer.
 
 ### **Greenhouse Asset Model**
@@ -162,7 +152,7 @@ The asset model individuals are used by the SMOL program as a starting point for
 Here follows a picture of the asset model:
 <!-- TODO: add picture of asset model -->
 
-### **Twinning the Greenhouse with SMOL**
+### **SMOL Twinning program**
 
 The SMOL program is run by the host computer and is responsible for creating the digital twin of the greenhouse.
 
@@ -172,9 +162,40 @@ It achieves this by:
 - For each asset object, retrieves sensor detections for that specific asset from the influxDB database (E.g. Retrieve moisture data for a specific pot).
 - After retrieving the data, the program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse. 
 
-### **Scheduled run using Java**
+### **SMOL scheduler**
 
 The SMOL program is run periodically by the host computer to retrieve the digital shadow of the greenhouse.
 A simple Java program is used to schedule the execution of the SMOL program.
+
+## **Execution Flow**
+
+Assuming that the host computer and the data collectors are  already running as specified in the [Project Setup](#project-setup) section, the execution flow is the following:
+
+1. The data collectors periodically collect data from the sensors and send them to the influxDB database.
+2. the SMOL Scheduler periodically runs The SMOL program.
+3. The SMOL program retrieves the asset model from the OWL file and generates SMOL objects from the asset model individuals.
+4. For each asset object, the SMOL program retrieves sensor detections for that specific asset from the influxDB database.
+5. After retrieving the data, the SMOL program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse.
+6. The SMOL scheduler retrieves the digital shadow of the greenhouse from the SMOL program and sends it to the user.
+
+# **Project Setup**
+
+## **Data Collectors Setup**
+
+- **Hardware**
+  @eduardz1
+- **Software**
+
+
+## **Host Computer Setup**
+
+- **InfluxDB**
+- **SMOL**
+- **Java**
+
+# **How to Run**
+
+The entry point of the project is the [SMOL scheduler](#smol-scheduler), which is responsible for running the SMOL program and sending the digital shadow to the user (eventually through an interface).
+<!-- TODO add info on how to run the SMOL scheduler -->
 
 
