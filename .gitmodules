@@ -1,6 +1,6 @@
-[submodule "influx_greenhouse_py"]
+[submodule "greenhouse-data-collector"]
 	path = influx_greenhouse_py
-	url = https://github.com/N-essuno/influx_greenhouse_py.git
+	url = https://github.com/N-essuno/greenhouse-data-collector
 [submodule "SemanticObjectsOrig"]
 	path = SemanticObjects
 	url = https://github.com/smolang/SemanticObjects.git
