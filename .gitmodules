@@ -1,5 +1,5 @@
 [submodule "greenhouse-data-collector"]
-	path = influx_greenhouse_py
+	path = greenhouse-data-collector
 	url = https://github.com/N-essuno/greenhouse-data-collector
 [submodule "SemanticObjectsOrig"]
 	path = SemanticObjects
