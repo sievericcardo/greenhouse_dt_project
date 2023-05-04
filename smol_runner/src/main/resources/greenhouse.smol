@@ -8,17 +8,6 @@ main
     String config = "config_local.yml";
 
     AssetModel assetModel = new AssetModel();
-
-    /*
-    String groupPosition = "right";
-    String potPosition = "left";
-    Int shelfFloor = 1;
-    // String shelfFloorString = intToString(shelfFloor);
-    String shelfFloorString = "1";
-    Pot pot1 = new Pot(shelfFloorString, groupPosition, potPosition);
-    Double moisture = pot1.getMoisture();
-    print(moisture);
-    */
     
     
     print("--------------------------------------------------- Pots from asset model + influx data");
@@ -99,7 +88,6 @@ end
 * Each plant is contained in a Pot. The Pot contains the information about which plant contains.
 */
 class Plant(String plantId)
-    // Return last health state detection for the plant
     Double getHealthState()
         Double healthState = 0.0;
         List<Double> influxReturn = null;
@@ -119,7 +107,6 @@ class Plant(String plantId)
         return healthState;
     end
 
-    // Return last growth state detection for the plant
     Double getGrowthState()
         Double growthState = 0.0;
         List<Double> influxReturn = null;
@@ -149,10 +136,13 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
 
     // Return last moisture detection for the pot
     Double getMoisture()
+        // TODO should parameterize query based on shelfFloor, groupPosition, potPosition of the specific instance
         Double moisture = 0.0;
         List<Double> influxReturn = null;
         
         // uses list because influx queries return lists
+        
+        
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -167,6 +157,24 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
         this.groupPosition,
         this.potPosition,
         this.shelfFloor);
+        
+
+        /*
+        influxReturn = access(
+            "from(bucket: \"greenhouse_test\")
+                |> range(start: -30d)
+                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
+                |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
+                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
+                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
+                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
+                |> keep(columns: [\"_value\"])
+                |> last()",
+        INFLUXDB("config_local.yml"));
+        */
+
+        Int length = influxReturn.length();
+        print(length);
         // get first value of list (list contains just one value)
         moisture = influxReturn.get(0);
         return moisture;
@@ -183,8 +191,10 @@ class Shelf(String shelfFloor)
     // Return last humidity detection for the shelf
     Double getHumidity()
         Double humidity = 0.0;
+        // TODO: should parameterize query based on shelfFloor of the specific instance
         List<Double> influxReturn = null;
         
+        // uses list because influx queries return lists
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -195,6 +205,7 @@ class Shelf(String shelfFloor)
                 |> last()",
         INFLUXDB("config_local.yml"),
         this.shelfFloor);
+        // get first value of list (list contains just one value)
         humidity = influxReturn.get(0);
         return humidity;
     end
@@ -227,11 +238,12 @@ end
 * There is a light sensor associated with the whole greenhouse.
 */
 class Greenhouse()
-    // get last light detection for the greenhouse
+    // get last light measurement for the greenhouse
     Double getLight()
         Double light = null;
         List<Double> influxReturn = null;
 
+        // get light measurement from influx
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -251,11 +263,12 @@ end
 * Each Pump is associated with a water pumping sensor.
 */
 class Pump(String shelfFloor, String groupPosition)
-    // get last water level detection for the pump
+    // get last water level measurement for the pump
     Double getPumpedWater()
         Double pumpedWater = null;
         List<Double> influxReturn = null;
 
+        // get pumped water measurement from influx
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -274,7 +287,7 @@ class Pump(String shelfFloor, String groupPosition)
 end
 
 /**
-* Retrieves asset model individuals and converts them to SMOL objects
+* Retrieves data from the asset model and convert it to SMOL objects
 */
 class AssetModel()
     // get pot instances from the asset model
