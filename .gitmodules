@@ -4,3 +4,6 @@
 [submodule "SemanticObjectsOrig"]
 	path = SemanticObjects
 	url = https://github.com/smolang/SemanticObjects.git
+[submodule "Setup-Instructions"]
+	path = Setup-Instructions
+	url = https://github.com/eduardz1/Setup-Instructions

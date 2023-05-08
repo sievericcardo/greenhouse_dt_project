@@ -1,7 +1,8 @@
 # Manual testing for InfluxDB
 
 Query to get last moisture measurement about the pot in the right group, left position, first floor
-```
+
+``` SQL
 from(bucket: "greenhouse_test")
   |> range(start: -30d)
   |> filter(fn: (r) => r["_measurement"] == "ast:pot")
@@ -13,14 +14,13 @@ from(bucket: "greenhouse_test")
   |> last()
 ```
 
-<br>
-
 Asset test data in line protocol format to load into InfluxDB for testing
 
 The timestamp is set to (DD/MM/YYYY): `02/05/2023 13:00:00 GMT+0200 (Central European Summer Time)`
 
 > Note: the timestamp precision used here is seconds. When uploading from influxDB dashboard you need to change the precision to seconds
-```
+
+```SQL
 ast:pot,shelf_floor=1,group_position=right,pot_position=left moisture=15.0 1683025200
 ast:pot,shelf_floor=1,group_position=right,pot_position=left moisture=10.0 1683025200
 ast:pot,shelf_floor=1,group_position=right,pot_position=left moisture=3.0 1683025200
