@@ -8,6 +8,10 @@ smol_runner/.idea/
 
 # .gitignore for Java project using Gradle and IntelliJ
 
+# Build files
+build/
+bin/
+
 # Gradle specific files
 .gradle/
 build/
