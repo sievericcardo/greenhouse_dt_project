@@ -1,5 +1,6 @@
 import no.uio.microobject.main.Settings;
 import no.uio.microobject.runtime.REPL;
+import org.apache.jena.query.ARQ;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 public class SmolRunner {
 
     public static void main(String[] args) {
-        org.apache.jena.query.ARQ.init();
+        ARQ.init();
         Settings settings = getSettings();
 
         REPL repl = new REPL(settings);
