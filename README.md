@@ -7,18 +7,18 @@ Repository containing other repositories related to the greenhouse digital twin 
 <!-- TODO: add simulations part -->
 
 - [Project Overview](#project-overview)
+- [Tools Overview](#tools-overview)
+  - [InfluxDB](#influxdb)
+  - [Python influxdb-client](#python-influxdb-client)
+  - [Python sensors libraries](#python-sensors-libraries)
+  - [OWL](#owl)
+  - [SMOL language](#smol-language)
 - [Project Architecture](#project-architecture)
   - [Physical Architecture](#physical-architecture)
     - [Greenhouse](#greenhouse)
     - [Assets - Sensors](#assets---sensors)
     - [Data collectors](#data-collectors)
     - [Host computer](#host-computer)
-  - [Tools Overview](#tools-overview)
-    - [InfluxDB](#influxdb)
-    - [Python influxdb-client](#python-influxdb-client)
-    - [Python sensors libraries](#python-sensors-libraries)
-    - [OWL](#owl)
-    - [SMOL language](#smol-language)
   - [Software Components](#software-components)
     - [Sensors Scripts](#sensors-scripts)
     - [Data Collectors Python program](#data-collectors-python-program)
@@ -30,6 +30,8 @@ Repository containing other repositories related to the greenhouse digital twin 
   - [Data Controllers](#data-collectors-setup)
   - [Host Computer](#host-computer-setup)
 - [How to run](#how-to-run)
+  - [Data Collectors](#data-collectors-run)
+  - [Host Computer](#host-computer-run)
 
 <!-- For reports also: results, discussion, conclusion -->
 
@@ -44,6 +46,60 @@ The Python program is designed to interact with InfluxDB, a time-series database
 The primary objective of this research project is to create a functional example of a digital twin that can showcase its potential in monitoring and managing a greenhouse environment. By creating a virtual replica of the greenhouse, we can simulate and analyze its behavior, and gain insights into how different components interact with each other. This digital twin can serve as a valuable tool for optimizing greenhouse operations, improving resource utilization, and enhancing overall crop yield.
 
 In this report, we will provide a detailed overview of the methodology used to develop the digital twin, present the results of our data analysis, discuss the implications of our findings, and highlight the potential applications of digital twins in various fields beyond agriculture. This research contributes to the growing body of knowledge on digital twins and serves as a practical example of their application in a real-world setting.
+
+## **Tools Overview**
+
+### **InfluxDB**
+
+[InfluxDB](https://www.influxdata.com/products/influxdb-overview/) is a time-series database that is used to store the data collected by the data collectors.
+
+It is composed by buckets which contains measurements.
+Each measurement is composed by:
+
+- measurement name
+- tags
+  - Used as keys by us to identify the data
+- fields
+  - Used by us to store the actual data from sensors
+- timestamp
+
+and represents a single data point in a specific time.
+
+This particular structure allows to get data for a specific time range and perform aggregations on it (e.g. mean)
+
+<!--
+TO ADD IN ANOTHER SECTION
+There is a single bucket in the database that is used to store all the data collected by the data collectors.
+Measurements from different assets have their own measurement name in the database.
+Each measurement has a set of fields that represent the data collected by the sensors, related to that asset. -->
+
+### **Python influxdb-client**
+
+The [Python influxdb-client](https://influxdb-client.readthedocs.io/en/latest/) is a Python library that is used to interact with the InfluxDB database.
+
+It is used by the data collectors to send data to the influxDB instance running in the host computer.
+
+### **Python sensors libraries**
+
+<!-- TODO what should we say about the required libraries for the sensors other than they are listed all in greenhouse-data-collector/requirements.txt ? -->
+
+### **OWL**
+
+[OWL](https://www.w3.org/TR/owl-ref/) is a knowledge representation language that is used to represent the asset model of the greenhouse. In other words is used to create a formal representation of the greenhouse physical structure.
+
+The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships between them.
+
+### **SMOL Language**
+
+[SMOL](https://smolang.org/) (Semantic Modeling Object Language) is an object-oriented language that, among others, allows to
+
+- Interact with influxDB to read data from the database
+- Read and query a knowledge graph, mapping the data read to objects in the language
+- Map the whole program state to a knowledge graph by mean of the _semantic lifting_. The program state can then be queried to extract information
+- Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
+
+In our case it is used to connect the asset model to the data collected by the data collectors, perform the semantic lifting of the program state and interact with simulations to create the digital twin of the greenhouse.
+
 
 ## Project Architecture
 
@@ -91,58 +147,6 @@ The user can interact with the digital twin though the host computer.
 
 <!-- When we know: add also responsible for simulations (modelica) -->
 
-### **Tools Overview**
-
-#### **InfluxDB**
-
-[InfluxDB](https://www.influxdata.com/products/influxdb-overview/) is a time-series database that is used to store the data collected by the data collectors.
-
-It is composed by buckets which contains measurements.
-Each measurement is composed by:
-
-- measurement name
-- tags
-  - Used as keys by us to identify the data
-- fields
-  - Used by us to store the actual data from sensors
-- timestamp
-
-and represents a single data point in a specific time.
-
-This particular structure allows to get data for a specific time range and perform aggregations on it (e.g. mean)
-
-<!--
-TO ADD IN ANOTHER SECTION
-There is a single bucket in the database that is used to store all the data collected by the data collectors.
-Measurements from different assets have their own measurement name in the database.
-Each measurement has a set of fields that represent the data collected by the sensors, related to that asset. -->
-
-#### **Python influxdb-client**
-
-The [Python influxdb-client](https://influxdb-client.readthedocs.io/en/latest/) is a Python library that is used to interact with the InfluxDB database.
-
-It is used by the data collectors to send data to the influxDB instance running in the host computer.
-
-#### **Python sensors libraries**
-
-<!-- TODO what should we say about the required libraries for the sensors other than they are listed all in greenhouse-data-collector/requirements.txt ? -->
-
-#### **OWL**
-
-[OWL](https://www.w3.org/TR/owl-ref/) is a knowledge representation language that is used to represent the asset model of the greenhouse. In other words is used to create a formal representation of the greenhouse physical structure.
-
-The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships between them.
-
-#### **SMOL Language**
-
-[SMOL](https://smolang.org/) (Semantic Modeling Object Language) is an object-oriented language that, among others, allows to
-
-- Interact with influxDB to read data from the database
-- Read and query a knowledge graph, mapping the data read to objects in the language
-- Map the whole program state to a knowledge graph by mean of the _semantic lifting_. The program state can then be queried to extract information
-- Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
-
-In our case it is used to connect the asset model to the data collected by the data collectors, perform the semantic lifting of the program state and interact with simulations to create the digital twin of the greenhouse.
 
 ### **Software Components**
 
@@ -212,11 +216,35 @@ For a complete guide on how to setup the controllers refer to the [controller se
 <!-- TODO -->
 
 - **InfluxDB**
+  - You can install influxDB on your host computer by following the [official guide](https://docs.influxdata.com/influxdb/v2.7/install/?t=Linux).
+
 - **SMOL**
+<!-- TODO add info about SMOL installation on host computer-->
+
 - **Java**
+<!-- TODO add info about JRE installation on host computer-->
 
 ## **How to Run**
 
-The entry point of the project is the [SMOL scheduler](#smol-scheduler), which is responsible for running the SMOL program and sending the digital shadow to the user (eventually through an interface).
+### **Run Data Collectors**
+For the reference on how to setup and run the data collectors refer to the [greenhouse-data-collector repository](https://github.com/N-essuno/greenhouse-data-collector)
 
-<!-- TODO add info on how to run the SMOL scheduler -->
+### **Run Host Computer**
+
+#### **InfluxDB**
+
+
+If you are running a linux distribution there is no need to start influxDB manually, it will start automatically after the installation.
+
+#### **SMOL Scheduler**
+The entry point of the project is the [SMOL scheduler](#smol-scheduler), which is responsible for running the SMOL program and sending the digital shadow to the user (eventually through an interface).
+Use the following commands to build and run the SMOL scheduler:
+
+  ```bash
+  cd ./smol_runner
+  ./gradlew build
+  java -jar ./build/libs/smol_runner.jar
+  ```
+
+
+<!-- TODO add info on how to run the SMOL scheduler, implement JAR creation and instructions on how to run JAR, add info about JRE installation on host computer-->
