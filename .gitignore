@@ -1,3 +1,7 @@
+#common_resources
+common_resources/config_cloud.yml
+common_resources/config_local.yml
+
 #smol_run
 smol_run/output/out.ttl
 smol_run/greenhouse.properties
@@ -29,8 +33,6 @@ SemanticObjects/.idea/
 
 # VS Code specific files
 .vscode/
-
-# Compiled Java class files
 
 # Generated files
 gen/
