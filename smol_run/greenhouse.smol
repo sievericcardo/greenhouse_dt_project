@@ -5,7 +5,7 @@ main
     Int lengthPlants = 0;
     Int i = 0;
 
-    String config = "config_local.yml";
+    String config = "config_cloud.yml";
 
     AssetModel assetModel = new AssetModel();
     
