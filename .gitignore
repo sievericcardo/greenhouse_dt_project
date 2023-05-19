@@ -1,6 +1,8 @@
 #smol_run
 smol_run/output/out.ttl
 smol_run/greenhouse.properties
+smol_run/config_local.yml
+smol_run/config_cloud.yml
 
 # smol_runner
 smol_runner/src/main/kg_output/
@@ -14,7 +16,6 @@ bin/
 
 # Gradle specific files
 .gradle/
-build/
 *.iml
 out/
 buildSrc/
