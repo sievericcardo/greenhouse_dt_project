@@ -1,5 +1,5 @@
-url: https://us-east-1-1.aws.cloud2.influxdata.com
-token: Bhc-5DhcPtZMfhFnEiVDc0_PGhok-jDNQECXgUJP_bjxlDxGyQ7XQ4GK9UJLV_JvSmkLKaQ8h0qXQHL2CLzgnw==
+url:
+token:
 org: Sirius
 bucket: greenhouse_test
 
