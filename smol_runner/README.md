@@ -7,9 +7,10 @@ This code provides a representation for the different assets we expect in the gr
 - Pump
 - Plant
 
-For each asset a class is defined
+For each asset a class is defined:
 
 ### Greenhouse (no fields)
+> There is only one `Greenhouse` so it is not identified by any field and it's not retrieved from the asset model. <br>
 
 #### Methods
 - `getLight()`
@@ -66,6 +67,10 @@ For each asset a class is defined
 
 <br>
 
+
+There is one class used as access point to the asset model:
+
 ### AssetModel
 
 > This class is used to retrieve the individuals from the asset model (represented by an [OWL ontology](../README.md#greenhouse-asset-model)) and convert them into SMOL objects. <br>
+> It contains one method per asset (Shelf, Pot, Plant, Pump) which returns a list of the corresponding SMOL objects. <br>
