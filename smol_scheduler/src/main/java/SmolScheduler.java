@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 
-public class SmolRunner {
+public class SmolScheduler {
 
     public static void main(String[] args) {
         ARQ.init();
@@ -19,7 +19,7 @@ public class SmolRunner {
         repl.command("verbose", "true");
 
         // TODO run test on test_influx_connection.smol
-        // maybe SMOLRunner should take a path to a smol file as an argument instead of hardcoding it
+        // maybe SmolScheduler should take a path to a smol file as an argument instead of hardcoding it
 
         repl.command("read",
             "../common_resources/greenhouse.smol");

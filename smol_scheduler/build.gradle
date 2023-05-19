@@ -21,14 +21,18 @@ test {
 }
 
 shadowJar {
-    archiveFileName='smol_runner.jar'
+    archiveFileName='smol_scheduler.jar'
 }
 assemble.dependsOn shadowJar
 
 jar {
     manifest {
         attributes(
-                'Main-Class': 'SmolRunner'
+                'Main-Class': 'SmolScheduler'
         )
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-source" << "17" << "-target" << "17"
 }
