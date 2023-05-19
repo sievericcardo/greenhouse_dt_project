@@ -110,7 +110,7 @@ In our case it is used to connect the asset model to the data collected by the d
 The specific greenhouse we are working with has the following characteristics:
 
 - The greenhouse is divided in two shelves.
-- Each shelf is composed by 2 groups of plants.
+- Each shelf is composed by 1 group of plants.
 - Each group of plants is watered by a water pump.
 - Each group of plants is composed by 2 plants.
 - Each plant is put inside a pot.
@@ -127,14 +127,14 @@ Here is a list of assets we are representing for our architecture, along with th
 - Pots
   - Soil Moisture
 - Plants
-  - Camera (measures plant health and growth)
+  - Infrared camera: it calculates the NDVI (Normalized Difference Vegetation Index) of the plant. We will use this data to determine the health of the plant.
 - Water pumps
   - Water flow
 
 #### **Data collectors**
 
 The data collectors are Raspberry Pi devices that collect data from the sensors and send it to the DB.
-Each data collector is associated to a greenhouse shelf and is responsible for collecting data on the assets that are located on that shelf (1 shelf, 4 pots, 4 plants, 2 water pumps).
+Each data collector is associated to a greenhouse shelf and is responsible for collecting data on the assets that are located on that shelf.
 
 #### **Host computer**
 
@@ -184,8 +184,8 @@ The SMOL program is run by the host computer and is responsible for creating the
 
 It achieves this by:
 
-- Reads the asset model from the OWL file
-- Generates SMOL objects from the asset model individuals
+- Reading the asset model from the OWL file
+- Generating SMOL objects from the asset model individuals
 - For each asset object, retrieves sensor detections for that specific asset from the influxDB database (E.g. Retrieve moisture data for a specific pot).
 - After retrieving the data, the program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse.
 
