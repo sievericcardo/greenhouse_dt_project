@@ -106,25 +106,6 @@ class Plant(String plantId)
         healthState = influxReturn.get(0);
         return healthState;
     end
-
-    Double getGrowthState()
-        Double growthState = 0.0;
-        List<Double> influxReturn = null;
-
-        influxReturn = access(
-            "from(bucket: \"greenhouse_test\")
-                |> range(start: -30d)
-                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:plant\")
-                |> filter(fn: (r) => r[\"_field\"] == \"growth_state\")
-                |> filter(fn: (r) => r[\"plant_id\"] == %1)
-                |> keep(columns: [\"_value\"])
-                |> last()",
-        INFLUXDB("config_local.yml"),
-        this.plantId);
-
-        growthState = influxReturn.get(0);
-        return growthState;
-    end
 end
 
 
