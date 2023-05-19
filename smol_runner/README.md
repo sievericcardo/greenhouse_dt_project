@@ -69,6 +69,3 @@ For each asset a class is defined
 ### AssetModel
 
 > This class is used to retrieve the individuals from the asset model (represented by an [OWL ontology](../README.md#greenhouse-asset-model)) and convert them into SMOL objects. <br>
-
-
-<br>
