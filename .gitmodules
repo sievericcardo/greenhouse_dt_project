@@ -7,3 +7,6 @@
 [submodule "Setup-Instructions"]
 	path = Setup-Instructions
 	url = https://github.com/eduardz1/Setup-Instructions
+[submodule "smol_scheduler"]
+	path = smol_scheduler
+	url = https://github.com/N-essuno/smol_scheduler
