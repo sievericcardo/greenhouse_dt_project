@@ -58,3 +58,4 @@ logs/
 Thumbs.db
 .DS_Store
 /smol_runner/src/main/resources/greenhouse.properties
+/common_resources/greenhouse.properties
