@@ -12,7 +12,7 @@ main
     Double moisture = pot1.getMoisture();
     print("moisture from influx: ");
     print(moisture);
-
+    
     print("--------------- Not working when getting pots from asset model ---------------");
     List<Pot> pots = assetModel.getPots(config); // gets just 1 pot since there is just 1 pot in the asset model
     lengthPots = pots.length();
