@@ -1,19 +1,13 @@
 #common_resources
 common_resources/config_cloud.yml
 common_resources/config_local.yml
+common_resources/distribute.py
 
 #smol_run
 smol_run/output/out.ttl
 smol_run/greenhouse.properties
 smol_run/config_local.yml
 smol_run/config_cloud.yml
-smol_runner/src/main/resources/config_local.yml
-smol_runner/src/main/resources/config_cloud.yml
-
-
-# smol_runner
-smol_runner/src/main/kg_output/
-smol_runner/.idea/
 
 # .gitignore for Java project using Gradle and IntelliJ
 
