@@ -5,8 +5,6 @@ main
     Int lengthPlants = 0;
     Int i = 0;
 
-    String config = "config_cloud.yml";
-
     AssetModel assetModel = new AssetModel();
     
     
@@ -41,9 +39,6 @@ main
         Double healthState = plant.getHealthState();
         print(" healthState: ");
         print(healthState);
-        Double growthState = plant.getGrowthState();
-        print(" growthState: ");
-        print(growthState);
         i = i+1;
     end
     
@@ -100,7 +95,7 @@ class Plant(String plantId)
                 |> filter(fn: (r) => r[\"plant_id\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"),
+        INFLUXDB("src/main/resources/config_local.yml"),
         this.plantId);
 
         healthState = influxReturn.get(0);
@@ -117,13 +112,10 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
 
     // Return last moisture detection for the pot
     Double getMoisture()
-        // TODO should parameterize query based on shelfFloor, groupPosition, potPosition of the specific instance
         Double moisture = 0.0;
         List<Double> influxReturn = null;
         
         // uses list because influx queries return lists
-        
-        
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -134,25 +126,10 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"),
+        INFLUXDB("src/main/resources/config_local.yml"),
         this.groupPosition,
         this.potPosition,
         this.shelfFloor);
-        
-
-        /*
-        influxReturn = access(
-            "from(bucket: \"greenhouse_test\")
-                |> range(start: -30d)
-                |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
-                |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
-                |> filter(fn: (r) => r[\"group_position\"] == \"right\")
-                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
-                |> filter(fn: (r) => r[\"shelf_floor\"] == \"1\")
-                |> keep(columns: [\"_value\"])
-                |> last()",
-        INFLUXDB("config_local.yml"));
-        */
 
         Int length = influxReturn.length();
         print(length);
@@ -172,7 +149,6 @@ class Shelf(String shelfFloor)
     // Return last humidity detection for the shelf
     Double getHumidity()
         Double humidity = 0.0;
-        // TODO: should parameterize query based on shelfFloor of the specific instance
         List<Double> influxReturn = null;
         
         // uses list because influx queries return lists
@@ -184,7 +160,7 @@ class Shelf(String shelfFloor)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"),
+        INFLUXDB("src/main/resources/config_local.yml"),
         this.shelfFloor);
         // get first value of list (list contains just one value)
         humidity = influxReturn.get(0);
@@ -194,7 +170,6 @@ class Shelf(String shelfFloor)
     // Return last temperature detection for the shelf
     Double getTemperature()
         Double temperature = 0.0;
-        // TODO: should parameterize query based on shelfFloor of the specific instance
         List<Double> influxReturn = null;
         
         // uses list because influx queries return lists
@@ -206,7 +181,7 @@ class Shelf(String shelfFloor)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_local.yml"),
+        INFLUXDB("src/main/resources/config_local.yml"),
         this.shelfFloor);
         // get first value of list (list contains just one value)
         temperature = influxReturn.get(0);
@@ -232,7 +207,7 @@ class Greenhouse()
                 |> filter(fn: (r) => r[\"_field\"] == \"light\")
                 |> keep(columns: [\"_value\"])
                 |> last()",
-            INFLUXDB("config_local.yml"));
+            INFLUXDB("src/main/resources/config_local.yml"));
         light = influxReturn.get(0);
         return light;
     end
@@ -244,12 +219,11 @@ end
 * Each Pump is associated with a water pumping sensor.
 */
 class Pump(String shelfFloor, String groupPosition)
-    // get last water level measurement for the pump
+// get pumped water measurement from influx
     Double getPumpedWater()
         Double pumpedWater = null;
         List<Double> influxReturn = null;
-
-        // get pumped water measurement from influx
+        
         influxReturn = access(
             "from(bucket: \"greenhouse_test\")
                 |> range(start: -30d)
@@ -259,7 +233,7 @@ class Pump(String shelfFloor, String groupPosition)
                 |> filter(fn: (r) => r[\"group_position\"] == %2)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-            INFLUXDB("config_local.yml"),
+            INFLUXDB("src/main/resources/config_local.yml"),
             this.shelfFloor,
             this.groupPosition);
         pumpedWater = influxReturn.get(0);
@@ -299,6 +273,7 @@ class AssetModel()
         return shelves;
     end
 
+    // get pump instances from the asset model
     List<Pump> getPumps()
         List<Pump> pumps = construct("
             PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
@@ -312,6 +287,7 @@ class AssetModel()
         return pumps;
     end
 
+    // get plant instances from the asset model
     List<Plant> getPlants()
         List<Plant> plants = construct("
             PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
