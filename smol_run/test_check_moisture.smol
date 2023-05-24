@@ -38,7 +38,7 @@ main
     print("--------------------------------------------------- Check plants moisture");
 
     // List of plants (ids of plants) that need to be watered
-    List<Int> plantsToWater = null;
+    List<PlantToWater> plantsToWater = null;
 
     // For each plant, check if it needs water. If it does, add it to the list of plants to water
     i = 0;
@@ -47,7 +47,8 @@ main
         Double plantMoisture = plant.getPotMoisture();
         if (plantMoisture < plant.idealMoisture) then
             print("Plant needs water");
-            plantsToWater = new List(plant.plantId, plantsToWater);
+            PlantToWater plantToWater = new PlantToWater(plant.plantId);
+            plantsToWater = new List(plantToWater, plantsToWater);
         else 
             print("Plant is fine");
         end
@@ -59,8 +60,8 @@ main
     Int plantsToWaterLength = plantsToWater.length();
     while i < plantsToWaterLength do
         print("Id plant to water: ");
-        Int idPlantToWater = plantsToWater.get(i);
-        print(idPlantToWater);
+        PlantToWater plantToWater = plantsToWater.get(i);
+        print(plantToWater.plantId);
         i = i + 1;
     end
 
@@ -135,4 +136,7 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
         moisture = influxReturn.get(0);
         return moisture;
     end
+end
+
+class PlantToWater(Int plantId)
 end
