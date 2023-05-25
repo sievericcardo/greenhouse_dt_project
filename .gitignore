@@ -4,7 +4,7 @@ common_resources/config_local.yml
 common_resources/distribute.py
 
 #smol_run
-smol_run/output/out.ttl
+smol_run/output/
 smol_run/greenhouse.properties
 smol_run/config_local.yml
 smol_run/config_cloud.yml
