@@ -47,11 +47,11 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
                 |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
                 |> filter(fn: (r) => r[\"group_position\"] == %1)
-                |> filter(fn: (r) => r[\"pot_position\"] == %2)
+                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("config_cloud.yml"),
+        INFLUXDB("config_local.yml"),
         this.groupPosition,
         this.potPosition,
         this.shelfFloor);
