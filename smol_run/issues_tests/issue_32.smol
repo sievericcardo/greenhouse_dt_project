@@ -1,7 +1,8 @@
 main
     Int lengthPots = 0;
+    Int i = 0;
 
-    List<Pot> pots = construct("
+    List<Pot> pots_partial_fields = construct("
         PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
         SELECT ?shelfFloor ?groupPosition
         WHERE {
@@ -9,14 +10,13 @@ main
                 ast:hasShelfFloor ?shelfFloor ;
                 ast:hasGroupPosition ?groupPosition.
         }");
-        return pots;
     
     
-    lengthPots = pots.length();
+    lengthPots = pots_partial_fields.length();
     while i < lengthPots do
         print("Pot: ");
         print(i);
-        Pot pot = pots.get(i);
+        Pot pot = pots_partial_fields.get(i);
         print("shelfFloor: ");
         print(pot.shelfFloor);
         print(" groupPosition: ");

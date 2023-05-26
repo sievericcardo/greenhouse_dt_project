@@ -226,10 +226,37 @@ For a complete guide on how to setup the controllers refer to the [controller se
 
 ## **How to Run**
 
-### **Run Tests**
+### **Run Demo**
 
-#### **Test InfluxDB**
+#### **Data collection Demo**
 
+To execute a demo of the interaction between data collectors and host machine, run the following command on a data collector device, from the root of the data-collector project:
+
+```bash
+
+```bash
+python3 scripts/demo_influx.py
+```
+
+The demo will create a database named `demo` and will populate it with pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
+
+The measurements refer to a pot with
+- shelf_floor = 1
+- group_position = left
+- pot_position = right
+- plant_id = 1
+
+#### **Actuation Demo**
+
+To execute a demo of the actuation system, run the following command on the host machine, from the root of the smol_scheduler project:
+
+```bash
+
+```
+
+The smol_scheduler will periodically run the smol program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
+
+When the moisture of the pot reaches a certain threshold, the actuator will be triggered and the pot will be watered.
 
 
 ### **Run Project**
