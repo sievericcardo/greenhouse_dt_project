@@ -53,7 +53,7 @@ In this report, we will provide a detailed overview of the methodology used to d
 
 [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) is a time-series database that is used to store the data collected by the data collectors.
 
-It is composed by buckets which contains measurements.
+It is composed of buckets which contain measurements.
 Each measurement is composed by:
 
 - measurement name
@@ -63,9 +63,9 @@ Each measurement is composed by:
   - Used by us to store the actual data from sensors
 - timestamp
 
-and represents a single data point in a specific time.
+and represents a single data point at a specific time.
 
-This particular structure allows to get data for a specific time range and perform aggregations on it (e.g. mean)
+This particular structure allows getting data for a specific time range and performing aggregations on it (e.g. mean)
 
 <!--
 TO ADD IN ANOTHER SECTION
@@ -77,7 +77,7 @@ Each measurement has a set of fields that represent the data collected by the se
 
 The [Python influxdb-client](https://influxdb-client.readthedocs.io/en/latest/) is a Python library that is used to interact with the InfluxDB database.
 
-It is used by the data collectors to send data to the influxDB instance running in the host computer.
+It is used by the data collectors to send data to the influxDB instance running on the host computer.
 
 ### **Python sensors libraries**
 
@@ -95,10 +95,12 @@ The asset model is used to represent the assets described in [Assets - Sensors](
 
 - Interact with influxDB to read data from the database
 - Read and query a knowledge graph, mapping the data read to objects in the language
-- Map the whole program state to a knowledge graph by mean of the _semantic lifting_. The program state can then be queried to extract information
+- Map the whole program state to a knowledge graph by means of the _semantic lifting_. The program state can then be queried to extract information
 - Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
 
-In our case it is used to connect the asset model to the data collected by the data collectors, perform the semantic lifting of the program state and interact with simulations to create the digital twin of the greenhouse.
+In our case, it is used to connect the asset model to the data collected by the data collectors,
+perform the semantic lifting of the program state
+and interact with simulations to create the digital twin of the greenhouse.
 
 
 ## Project Architecture
@@ -110,9 +112,9 @@ In our case it is used to connect the asset model to the data collected by the d
 The specific greenhouse we are working with has the following characteristics:
 
 - The greenhouse is divided in two shelves.
-- Each shelf is composed by 1 group of plants.
-- Each group of plants is watered by a water pump.
-- Each group of plants is composed by 2 plants.
+- Each shelf is composed of 1 group of plants.
+- A single water pump waters each group of plants.
+- 2 plants of the same type compose a group of plants.
 - Each plant is put inside a pot.
 
 #### **Assets - Sensors**
@@ -164,19 +166,20 @@ Python program that is run on the data collectors and is responsible for collect
 
 It achieves this by:
 
-- A virtual representation of the various assets in the greenhouse is created (E.g. Plants in the greenhouse).
-- Each virtual asset is connected to a set of physical sensors (E.g. Virtual plants are connected to the appropriate camera that retrieves plant health and growth).
-- Virtual assets periodically collect data from the sensors, create a data point containing the asset identifiers and the sensors detection and send it to the host computer.
+- A virtual representation of the various assets in the greenhouse is created (E.g., Plants in the greenhouse).
+- Each virtual asset is connected to a set of physical sensors (E.g., Virtual plants are connected to the appropriate camera that retrieves plant health and growth).
+- Virtual assets periodically collect data from the sensors, create a data point containing the asset identifiers and the sensors' detection and send it to the host computer.
 
 ### **Greenhouse Asset Model**
 
-The Greenhouse Asset Model is an OWL representation of the physical structure of the greenhouse and the relationships between the various assets in the greenhouse.
+The Greenhouse Asset Model is an OWL file
+representing the physical structure of the greenhouse and the relationships between the various assets in the greenhouse.
 
-The asset model individuals are used by the SMOL program as a starting point for twinning the greenhouse.
+The SMOL program uses the asset model individuals as a starting point for twinning the greenhouse.
 
 Here follows a picture of the asset model:
 
-<!-- TODO: add picture of asset model -->
+<!-- TODO: add picture of the asset model -->
 
 ### **SMOL Twinning program**
 
@@ -186,7 +189,7 @@ It achieves this by:
 
 - Reading the asset model from the OWL file
 - Generating SMOL objects from the asset model individuals
-- For each asset object, retrieves sensor detections for that specific asset from the influxDB database (E.g. Retrieve moisture data for a specific pot).
+- For each asset object, retrieves sensor detections for that specific asset from the influxDB database (E.g., Retrieve moisture data for a specific pot).
 - After retrieving the data, the program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse.
 
 ### **SMOL scheduler**
@@ -210,7 +213,8 @@ Assuming that the host computer and the data collectors are already running as s
 ## **Data Collectors Setup**
 @eduardz1
 <!-- TODO Fix hardware setup and copy here -->
-For a complete guide on how to set up the controllers refer to the [controller setup](Setup-Instructions/controller-instructions.md)
+For a complete guide on how to set up the controllers,
+refer to the [controller setup](Setup-Instructions/controller-instructions.md)
 
 ## **Host Computer Setup**
 
@@ -247,7 +251,8 @@ The measurements refer to a pot with
 
 #### **Actuation Demo**
 
-To execute a demo of the actuation system, run the following command on the host machine, from the root of the smol_scheduler project:
+To execute a demo of the actuation system,
+run the following command on the host machine from the root of the smol_scheduler project:
 
 ```bash
 
@@ -268,7 +273,8 @@ For the reference on how to set up and run the data collectors refer to the [gre
 ##### **InfluxDB**
 
 
-If you are running a linux distribution there is no need to start influxDB manually, it will start automatically after the installation.
+If you are running a linux distribution, there is no need to start influxDB manually;
+it will start automatically after the installation.
 
 ##### **SMOL Scheduler**
 The entry point of the project is the [SMOL scheduler](#smol-scheduler), which is responsible for running the SMOL program and sending the digital shadow to the user (eventually through an interface).
