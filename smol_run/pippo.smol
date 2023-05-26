@@ -4,16 +4,24 @@ main
 
     AssetModel assetModel = new AssetModel();
     
-    print("--------------- Working when creating pots manually ---------------");
-    String groupPosition = "right";
+    print("--------------- Creating pots manually ---------------");
+    String groupPosition = "left";
     String potPosition = "left";
     String shelfFloor = "1";
     Pot pot1 = new Pot(shelfFloor, groupPosition, potPosition);
-    Double moisture = pot1.getMoisture();
+    print("shelfFloor: ");
+    print(pot1.shelfFloor);
+    print(" groupPosition: ");
+    print(pot1.groupPosition);
+    print(" potPosition: ");
+    print(pot1.potPosition);
+    print("--------------- Run influx query on pot created manually ---------------");
     print("moisture from influx: ");
+    Double moisture = pot1.getMoisture();
     print(moisture);
+    print("------------------------------- End query -------------------------------");
     
-    print("--------------- Not working when getting pots from asset model ---------------");
+    print("--------------- Getting pots from asset model ---------------");
     List<Pot> pots = assetModel.getPots(config); // gets just 1 pot since there is just 1 pot in the asset model
     lengthPots = pots.length();
     while i < lengthPots do 
@@ -24,9 +32,12 @@ main
         print(pot.groupPosition);
         print(" potPosition: ");
         print(pot.potPosition);
+        print("--------------- Run influx query for pot created from construct ---------------");
         print(" moisture from influx: ");
-        moisture = pot.getMoisture(); // gets 3 measurement for the same pot
+        moisture = pot.getMoisture();
         print(moisture);
+        print("---------------------------------- End query ----------------------------------");
+
         i = i+1;
     end
 
@@ -47,7 +58,7 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
                 |> filter(fn: (r) => r[\"_measurement\"] == \"ast:pot\")
                 |> filter(fn: (r) => r[\"_field\"] == \"moisture\")
                 |> filter(fn: (r) => r[\"group_position\"] == %1)
-                |> filter(fn: (r) => r[\"pot_position\"] == \"left\")
+                |> filter(fn: (r) => r[\"pot_position\"] == %2)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
