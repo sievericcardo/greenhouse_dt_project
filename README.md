@@ -30,8 +30,8 @@ Repository containing other repositories related to the greenhouse digital twin 
   - [Data Controllers](#data-collectors-setup)
   - [Host Computer](#host-computer-setup)
 - [How to run](#how-to-run)
-  - [Data Collectors](#data-collectors-run)
-  - [Host Computer](#host-computer-run)
+  - [Demo](#run-demo)
+  - [Main](#run-project)
 
 <!-- For reports also: results, discussion, conclusion -->
 
@@ -154,9 +154,9 @@ The user can interact with the digital twin though the host computer.
 
 They consist in python scripts that are run on the data collectors and are responsible for collecting data from the sensors and sending them to the influxDB instance on the host computer.
 
-All the scripts are grouped in the `greenhouse-data-collector` project in the [sensors](greenhouse-data-collector/collector/sensors) module. We chose to apply an OO approach to the problem where each measurement (Humidity, Moisture, Temperature...) is represented with a class. When not strictly coupled, physical sensor controllers and measurements are separated from each other, making the code more modular. Each class contains a `read()` method which returns the value, when needed the class may call an `Interpreter` to convert the raw value, in that case the mapping can be configured by modifying the [config.ini](greenhouse-data-collector/config.ini.example) file.
+All the scripts are grouped in the `greenhouse-data-collector` project in the [sensors'](greenhouse-data-collector/collector/sensors) module. We chose to apply an OO approach to the problem where each measurement (Humidity, Moisture, Temperature...) is represented with a class. When not strictly coupled, physical sensor controllers and measurements are separated from each other, making the code more modular. Each class contains a `read()` method which returns the value, when needed the class may call an `Interpreter` to convert the raw value, in that case the mapping can be configured by modifying the [config.ini](greenhouse-data-collector/collector/config.ini.example) file.
 
-<!-- TODO talk about NDVI, there are a lot of steps to do to make the number returned by the call to numpy.mean() significant -->
+<!-- TODO talk about NDVI, there are a lot of steps to take to make the number returned by the call to numpy.mean() significant -->
 
 #### **Data collectors Python program**
 
@@ -208,8 +208,9 @@ Assuming that the host computer and the data collectors are already running as s
 ## **Project Setup**
 
 ## **Data Collectors Setup**
-
-For a complete guide on how to setup the controllers refer to the [controller setup](Setup-Instructions/controller-instructions.md)
+@eduardz1
+<!-- TODO Fix hardware setup and copy here -->
+For a complete guide on how to set up the controllers refer to the [controller setup](Setup-Instructions/controller-instructions.md)
 
 ## **Host Computer Setup**
 
@@ -231,8 +232,6 @@ For a complete guide on how to setup the controllers refer to the [controller se
 #### **Data collection Demo**
 
 To execute a demo of the interaction between data collectors and host machine, run the following command on a data collector device, from the root of the data-collector project:
-
-```bash
 
 ```bash
 python3 scripts/demo_influx.py
@@ -262,7 +261,7 @@ When the moisture of the pot reaches a certain threshold, the actuator will be t
 ### **Run Project**
 
 #### **Run Data Collectors**
-For the reference on how to setup and run the data collectors refer to the [greenhouse-data-collector repository](https://github.com/N-essuno/greenhouse-data-collector)
+For the reference on how to set up and run the data collectors refer to the [greenhouse-data-collector repository](https://github.com/N-essuno/greenhouse-data-collector)
 
 #### **Run Host Computer**
 
