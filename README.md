@@ -226,17 +226,25 @@ For a complete guide on how to setup the controllers refer to the [controller se
 
 ## **How to Run**
 
-### **Run Data Collectors**
+### **Run Tests**
+
+#### **Test InfluxDB**
+
+
+
+### **Run Project**
+
+#### **Run Data Collectors**
 For the reference on how to setup and run the data collectors refer to the [greenhouse-data-collector repository](https://github.com/N-essuno/greenhouse-data-collector)
 
-### **Run Host Computer**
+#### **Run Host Computer**
 
-#### **InfluxDB**
+##### **InfluxDB**
 
 
 If you are running a linux distribution there is no need to start influxDB manually, it will start automatically after the installation.
 
-#### **SMOL Scheduler**
+##### **SMOL Scheduler**
 The entry point of the project is the [SMOL scheduler](#smol-scheduler), which is responsible for running the SMOL program and sending the digital shadow to the user (eventually through an interface).
 Use the following commands to build and run the SMOL scheduler:
 
@@ -248,3 +256,5 @@ Use the following commands to build and run the SMOL scheduler:
 
 
 <!-- TODO add info on how to run the SMOL scheduler, implement JAR creation and instructions on how to run JAR, add info about JRE installation on host computer-->
+
+
