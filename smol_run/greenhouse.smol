@@ -43,7 +43,7 @@ main
     end
     
     print("--------------------------------------------------- Shelves from asset model + influx data");
-    List<Shelf> shelves = assetModel.getShelves(config);
+    List<Shelf> shelves = assetModel.getShelves();
     lengthShelves = shelves.length();
     i = 0;
     while i < lengthShelves do
@@ -60,7 +60,7 @@ main
     end
 
     print("--------------------------------------------------- Pumps from asset model + influx data");
-    List<Pump> pumps = assetModel.getPumps(config);
+    List<Pump> pumps = assetModel.getPumps();
     lengthPumps = pumps.length();
     i = 0;
     while i < lengthPumps do
