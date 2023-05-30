@@ -238,29 +238,120 @@ refer to the [controller setup](Setup-Instructions/controller-instructions.md)
 To execute a demo of the interaction between data collectors and host machine, run the following command on a data collector device, from the root of the data-collector project:
 
 ```bash
-python3 scripts/demo_influx.py
+python3 -m collector --demo
 ```
 
-The demo will create a database named `demo` and will populate it with pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
+The demo will create a bucket named `demo` and will populate it with:
+- Pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
+- Plant measurements
 
-The measurements refer to a pot with
+The pot measurements refer to a pot with
 - shelf_floor = 1
 - group_position = left
 - pot_position = right
 - plant_id = 1
 
+The plant measurements refer to a plant with
+- plant_id = 1
+- group_position = left
+- pot_position = right
+
 #### **Actuation Demo**
 
-To execute a demo of the actuation system,
-run the following command on the host machine from the root of the smol_scheduler project:
+To run a demo of the actuation system, run the following commands on the host machine from the root of the smol_scheduler project:
 
+Build:
 ```bash
+./gradlew build
+```
 
+Execute
+```bash
+java -jar .\build\libs\smol_scheduler.jar
 ```
 
 The smol_scheduler will periodically run the smol program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
 
 When the moisture of the pot reaches a certain threshold, the actuator will be triggered and the pot will be watered.
+The threshold is fixed in the asset model.
+
+In particular it will repeat the following steps every `n` seconds (`n` is fixed in the configuration file):
+- Run the SMOL program to get the plants to be watered
+- Use REPL `dump` command to create the lifted state of the SMOL program
+  - The lifted state is a knowledge graph representing the state of the greenhouse
+  - It will contain some triples with the predicate `PlantToWater_plantId`. The object of each of this triple is the id of a plant to be watered.
+- Retrieve the `PlantToWater_plantId` objects from the lifted state (which are the ids of the plants to be watered)
+- If there are plants to be watered it will trigger the actuation system for each of them. The trigger is done by:
+  - Connecting via SSH to the actuator controlling the pump in the greenhouse
+  - Executing the command to start the pump for 1 second (to be adjusted)
+
+
+<br>
+
+**SMOL scheduler needed files**
+
+To run the SMOL Scheduler you need to provide also
+- The SMOL file to be run
+- The asset model (Turtle file)
+- 3 configuration files
+
+**SMOL program**
+
+The SMOL program run in the demo is the `test_check_moisture.smol` file.
+
+It will:
+- Retrieve the plants from the asset model creating `Plant` objects with the following fields:
+  - Plant Id
+  - Ideal moisture
+- Retrieve from influxDB database the last moisture measurement of the pot in which the plant is placed
+  - This is done calling the `getPotMoisture()` of the `Plant` object
+- For each plants which has `moisture < idealMoisture`:
+  - Create an `PlantToWater` object representing a Plant to be watered. The object contains just the id of the plant.
+
+<br>
+
+> NOTE: the `PlantToWater` object is created in order to be represented in the knowledge graph once the semantical lifting of the program state is performed. <br>
+> It will be used by the SMOL scheduler to trigger the actuation system.
+
+<br>
+
+**Asset model**
+
+**Configuration files**
+
+The configuration files need to stay in the same folder as the SMOL Scheduler JAR file.
+
+The templates are available in the `smol_scheduler/src/main/resources` folder
+
+- `config_local.yml`: used by the SMOL program toa access to influxDB
+- `config_scheduler.yml`: used by the SMOL scheduler to get the following information:
+  - Path of the SMOL program
+  - Path of the asset model
+  - Path of the lifted state output
+  - Domain prefix
+  - Seconds between every execution of the SMOL program
+- `config_ssh.yml`: used by the SMOL scheduler to get the following information:
+  - Actuator IP address (host)
+  - Actuator Username
+  - Actuator Password
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### **Run Project**
