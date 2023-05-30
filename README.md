@@ -210,23 +210,31 @@ Assuming that the host computer and the data collectors are already running as s
 
 ## **Project Setup**
 
-## **Data Collectors Physical Setup**
+## **Data Collectors Setup**
 @eduardz1
 <!-- TODO Fix hardware setup and copy here -->
 For a complete guide on how to set up the controllers,
 refer to the [controller setup](Setup-Instructions/controller-instructions.md)
 
+### **Hardware Setup**
+
+### **Software Setup**
+
+
+
 <br>
 
-## **Actuator Physical Setup**
+## **Actuator Setup**
 @eduardz1
 <!-- TODO Fix hardware setup and copy here -->
+
+### **Hardware Setup**
+
+### **Software Setup**
 
 <br>
 
 ## **Host Computer Setup**
-
-<!-- TODO -->
 
 - **InfluxDB**
   - You can install influxDB on your host computer by following the [official guide](https://docs.influxdata.com/influxdb/v2.7/install/?t=Linux).
@@ -356,7 +364,7 @@ Individuals:
   - `potPosition = left`
   - `plantId = 1`
 
-
+<br>
 
 **Configuration files**
 
@@ -377,9 +385,22 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
   - Actuator Username
   - Actuator Password
 
+<br>
+
 #### **Actuator Script**
 
+The actuator script is a python script used to physically trigger different components of the greenhouse (as the moment only the pump).
 
+**Config file**
+It uses a configuration file to get the GPIO PIN of the Raspberry PI to which the pump is connected. A template of the configuration file is available in the `actuator_script` folder.
+
+**Run the script**
+It takes as input the following parameters:
+- `command`: the command to execute. At the moment only `pump` is supported to trigger the water pump
+- if `command = pump`:
+  - `seconds`: the number of seconds to keep the pump on
+
+<br>
 
 
 
