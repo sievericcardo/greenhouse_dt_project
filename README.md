@@ -210,11 +210,19 @@ Assuming that the host computer and the data collectors are already running as s
 
 ## **Project Setup**
 
-## **Data Collectors Setup**
+## **Data Collectors Physical Setup**
 @eduardz1
 <!-- TODO Fix hardware setup and copy here -->
 For a complete guide on how to set up the controllers,
 refer to the [controller setup](Setup-Instructions/controller-instructions.md)
+
+<br>
+
+## **Actuator Physical Setup**
+@eduardz1
+<!-- TODO Fix hardware setup and copy here -->
+
+<br>
 
 ## **Host Computer Setup**
 
@@ -222,12 +230,18 @@ refer to the [controller setup](Setup-Instructions/controller-instructions.md)
 
 - **InfluxDB**
   - You can install influxDB on your host computer by following the [official guide](https://docs.influxdata.com/influxdb/v2.7/install/?t=Linux).
+  - You can run the following command:
 
-- **SMOL**
-<!-- TODO add info about SMOL installation on host computer-->
+```bash
+sudo apt-get update && sudo apt-get install influxdb2
+```
 
 - **Java**
-<!-- TODO add info about JRE installation on host computer-->
+  - Install JAVA jdk and jre using the following command:
+
+```bash
+sudo apt install openjdk-17-jdk openjdk-17-jre
+```
 
 ## **How to Run**
 
@@ -317,13 +331,41 @@ It will:
 
 **Asset model**
 
+The asset model used in the demo is the `greenhouse.ttl` file. <br>
+As the moment it contains more information than needed. The relevant and used information for the demo is the following:
+
+Classes:
+- `Plant`
+  - `plantId`: the id of the plant
+  - `idealMoisture`: the ideal moisture of the plant
+  - Subclasses
+    - `Basilicum`
+- `Pot`
+  - `shelfFloor`: the shelf floor in which the pot is placed (1 or 2)
+  - `groupPosition`: the group on the shelf in which the pot is placed (left or right)
+  - `potPosition`: the pot position with respect to the group in which the pot is placed (left or right)
+  - `plantId`: the id of the plant placed in the pot
+
+Individuals:
+- `basilicum1`
+  - `plantId = 1`
+  - `idealMoisture = 50`
+- `pot1`
+  - `shelfFloor = 1`
+  - `groupPosition = left`
+  - `potPosition = left`
+  - `plantId = 1`
+
+
+
 **Configuration files**
 
 The configuration files need to stay in the same folder as the SMOL Scheduler JAR file.
 
 The templates are available in the `smol_scheduler/src/main/resources` folder
 
-- `config_local.yml`: used by the SMOL program toa access to influxDB
+- `config_local.yml`: used by the SMOL program to access to influxDB
+  - NOTE: it used by the SMOL program and as now it's hardcoded in the SMOL program. You need to the the location of the file in the SMOL program code when running the influxDB queries.
 - `config_scheduler.yml`: used by the SMOL scheduler to get the following information:
   - Path of the SMOL program
   - Path of the asset model
@@ -334,6 +376,8 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
   - Actuator IP address (host)
   - Actuator Username
   - Actuator Password
+
+#### **Actuator Script**
 
 
 
@@ -374,7 +418,7 @@ Use the following commands to build and run the SMOL scheduler:
   ```bash
   cd ./smol_runner
   ./gradlew build
-  java -jar ./build/libs/smol_runner.jar
+  java -jar ./build/libs/smol_scheduler.jar
   ```
 
 
