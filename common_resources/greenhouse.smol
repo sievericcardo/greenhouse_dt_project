@@ -1,88 +1,73 @@
 main
-    Int lengthPots = 0;
-    Int lengthShelves = 0;
-    Int lengthPumps = 0;
-    Int lengthPlants = 0;
     Int i = 0;
+    Int j = 0;
+    Plant plant = null;
+    PlantToWater plantToWater = null;
+    // List of plants (ids of plants) that need to be watered
+    List<PlantToWater> plantsToWater = null;
 
     AssetModel assetModel = new AssetModel();
-    
-    
-    print("--------------------------------------------------- Pots from asset model + influx data");
 
-    List<Pot> pots = assetModel.getPots(config);
-    lengthPots = pots.length();
-    while i < lengthPots do
-        print("Pot: ");
-        print(i);
-        Pot pot = pots.get(i);
-        print("shelfFloor: ");
-        print(pot.shelfFloor);
-        print(" groupPosition: ");
-        print(pot.groupPosition);
-        print(" potPosition: ");
-        print(pot.potPosition);
-        print(" moisture: ");
-        Double moisture = pot.getMoisture();
-        print(moisture);
-        i = i+1;
-    end
+    List<Plant> plants = assetModel.getPlants();
+    List<HealthState> healthStates = assetModel.getHealthStates();
+    Int healthStatesLength = healthStates.length();
 
-    print("--------------------------------------------------- Plants from asset model + influx data");
-    List<Plant> plants = assetModel.getPlants(config);
-    lengthPlants = plants.length();
+
+    print("--------------------------------------------------- Get plants moisture");
+
+    Int plantsLength = plants.length();
+
+    // For each plant, print plant id, ideal moisture and current moisture got from InfluxDB
+    // and check moisture
     i = 0;
-    while i < lengthPlants do
-        Plant plant = plants.get(i);
-        print("plantId: ");
+    while i < plantsLength do
+        plant = plants.get(i);
+        Double plantMoisture = plant.getPotMoisture();
+        print("Plant id: ");
         print(plant.plantId);
-        Double ndvi = plant.getNdvi();
-        print(" ndvi: ");
-        print(ndvi);
-        i = i+1;
-    end
-    
-    print("--------------------------------------------------- Shelves from asset model + influx data");
-    List<Shelf> shelves = assetModel.getShelves(config);
-    lengthShelves = shelves.length();
-    i = 0;
-    while i < lengthShelves do
-        Shelf shelf = shelves.get(i);
-        print("shelfFloor: ");
-        print(shelf.shelfFloor);
-        Double humidity = shelf.getHumidity();
-        print(" humidity: ");
-        print(humidity);
-        Double temperature = shelf.getTemperature();
-        print(" temperature: ");
-        print(temperature);
-        i = i+1;
-    end
+        print("idealMoisture: ");
+        print(plant.idealMoisture);
+        print("moisture: ");
+        print(plantMoisture);
+        print("----------------------------------------");
+        // For each plant, check if it needs water. If it does, add it to the list of plants to water
+        if (plantMoisture < plant.idealMoisture) then
+            plantToWater = new PlantToWater(plant.plantId);
+            plantsToWater = new List(plantToWater, plantsToWater);
+        end
+        j = 0;
+        while j < healthStatesLength do
+            HealthState healthState = healthStates.get(j);
+            Double plantNdvi = plant.getNdvi();
 
-    print("--------------------------------------------------- Pumps from asset model + influx data");
-    List<Pump> pumps = assetModel.getPumps(config);
-    lengthPumps = pumps.length();
-    i = 0;
-    while i < lengthPumps do
-        Pump pump = pumps.get(i);
-        print("shelfFloor: ");
-        print(pump.shelfFloor);
-        print(" groupPosition: ");
-        print(pump.groupPosition);
-        Double pumpedWater = pump.getPumpedWater();
-        print(" pumpedWater: ");
-        print(pumpedWater);
-        i = i+1;
+            Double healthStateMinNdvi = healthState.minNdvi;
+            Double healthStateMaxNdvi = healthState.maxNdvi;
+
+            Boolean minOk = plantNdvi >= healthStateMinNdvi;
+            Boolean maxOk = plantNdvi <= healthStateMaxNdvi;
+            // && not working
+            if minOk then
+                if maxOk then
+                    plant.healthState = healthState.name;
+                end
+            end
+            j = j + 1;
+        end
+        i = i + 1;
     end
 
     breakpoint;
+end
+
+
+class PlantToWater(String plantId)
 end
 
 /**
 * Represents a physical Plant. Should be retrieved from the asset model via AssetModel.getPlants()
 * Each plant is contained in a Pot. The Pot contains the information about which plant contains.
 */
-class Plant(String plantId, Double idealMoisture)
+class Plant(String plantId, Double idealMoisture, String healthState)
     Double getNdvi()
         Double healthState = 0.0;
         List<Double> influxReturn = null;
@@ -95,7 +80,7 @@ class Plant(String plantId, Double idealMoisture)
                 |> filter(fn: (r) => r[\"plant_id\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("src/main/resources/config_local.yml"),
+        INFLUXDB("config_local.yml"),
         this.plantId);
 
         healthState = influxReturn.get(0);
@@ -114,7 +99,7 @@ class Plant(String plantId, Double idealMoisture)
                 |> filter(fn: (r) => r[\"plant_id\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("src/main/resources/config_local.yml"),
+        INFLUXDB("config_local.yml"),
         this.plantId);
 
         moisture = influxReturn.get(0);
@@ -145,7 +130,7 @@ class Pot(String shelfFloor, String groupPosition, String potPosition)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %3)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("src/main/resources/config_local.yml"),
+        INFLUXDB("config_local.yml"),
         this.groupPosition,
         this.potPosition,
         this.shelfFloor);
@@ -179,7 +164,7 @@ class Shelf(String shelfFloor)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("src/main/resources/config_local.yml"),
+        INFLUXDB("config_local.yml"),
         this.shelfFloor);
         // get first value of list (list contains just one value)
         humidity = influxReturn.get(0);
@@ -200,7 +185,7 @@ class Shelf(String shelfFloor)
                 |> filter(fn: (r) => r[\"shelf_floor\"] == %1)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-        INFLUXDB("src/main/resources/config_local.yml"),
+        INFLUXDB("config_local.yml"),
         this.shelfFloor);
         // get first value of list (list contains just one value)
         temperature = influxReturn.get(0);
@@ -226,7 +211,7 @@ class Greenhouse()
                 |> filter(fn: (r) => r[\"_field\"] == \"light\")
                 |> keep(columns: [\"_value\"])
                 |> last()",
-            INFLUXDB("src/main/resources/config_local.yml"));
+            INFLUXDB("config_local.yml"));
         light = influxReturn.get(0);
         return light;
     end
@@ -252,12 +237,16 @@ class Pump(String shelfFloor, String groupPosition)
                 |> filter(fn: (r) => r[\"group_position\"] == %2)
                 |> keep(columns: [\"_value\"])
                 |> last()",
-            INFLUXDB("src/main/resources/config_local.yml"),
+            INFLUXDB("config_local.yml"),
             this.shelfFloor,
             this.groupPosition);
         pumpedWater = influxReturn.get(0);
         return pumpedWater;
     end
+end
+
+class HealthState(String name, Double minNdvi, Double maxNdvi)
+
 end
 
 /**
@@ -319,4 +308,99 @@ class AssetModel()
         ");
         return plants;
     end
+
+    // get health state instances from the asset model
+    List<HealthState> getHealthStates()
+        List<HealthState> healthStates = construct("
+            PREFIX ast: <http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#>
+            SELECT ?name ?minNdvi ?maxNdvi
+            WHERE {
+                ?healthState rdf:type ast:HealthState ;
+                    ast:hasName ?name ;
+                    ast:hasMinNdvi ?minNdvi ;
+                    ast:hasMaxNdvi ?maxNdvi .
+            }
+        ");
+        return healthStates;
+    end
+
+    Unit printAssetModelData()
+        Int lengthPots = 0;
+        Int lengthShelves = 0;
+        Int lengthPumps = 0;
+        Int lengthPlants = 0;
+        Int i = 0;
+
+        AssetModel assetModel = new AssetModel();
+        
+        
+        print("--------------------------------------------------- Pots from asset model + influx data");
+
+        List<Pot> pots = assetModel.getPots(config);
+        lengthPots = pots.length();
+        while i < lengthPots do
+            print("Pot: ");
+            print(i);
+            Pot pot = pots.get(i);
+            print("shelfFloor: ");
+            print(pot.shelfFloor);
+            print(" groupPosition: ");
+            print(pot.groupPosition);
+            print(" potPosition: ");
+            print(pot.potPosition);
+            print(" moisture: ");
+            Double moisture = pot.getMoisture();
+            print(moisture);
+            i = i+1;
+        end
+
+        print("--------------------------------------------------- Plants from asset model + influx data");
+        List<Plant> plants = assetModel.getPlants(config);
+        lengthPlants = plants.length();
+        i = 0;
+        while i < lengthPlants do
+            Plant plant = plants.get(i);
+            print("plantId: ");
+            print(plant.plantId);
+            Double ndvi = plant.getNdvi();
+            print(" ndvi: ");
+            print(ndvi);
+            i = i+1;
+        end
+        
+        print("--------------------------------------------------- Shelves from asset model + influx data");
+        List<Shelf> shelves = assetModel.getShelves(config);
+        lengthShelves = shelves.length();
+        i = 0;
+        while i < lengthShelves do
+            Shelf shelf = shelves.get(i);
+            print("shelfFloor: ");
+            print(shelf.shelfFloor);
+            Double humidity = shelf.getHumidity();
+            print(" humidity: ");
+            print(humidity);
+            Double temperature = shelf.getTemperature();
+            print(" temperature: ");
+            print(temperature);
+            i = i+1;
+        end
+
+        print("--------------------------------------------------- Pumps from asset model + influx data");
+        List<Pump> pumps = assetModel.getPumps(config);
+        lengthPumps = pumps.length();
+        i = 0;
+        while i < lengthPumps do
+            Pump pump = pumps.get(i);
+            print("shelfFloor: ");
+            print(pump.shelfFloor);
+            print(" groupPosition: ");
+            print(pump.groupPosition);
+            Double pumpedWater = pump.getPumpedWater();
+            print(" pumpedWater: ");
+            print(pumpedWater);
+            i = i+1;
+        end
+    end
+
+
 end
