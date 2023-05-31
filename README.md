@@ -102,7 +102,6 @@ In our case, it is used to connect the asset model to the data collected by the 
 perform the semantic lifting of the program state
 and interact with simulations to create the digital twin of the greenhouse.
 
-
 ## Project Architecture
 
 ### **Physical Architecture**
@@ -148,7 +147,6 @@ The host computer runs
 The user can interact with the digital twin though the host computer.
 
 <!-- When we know: add also responsible for simulations (modelica) -->
-
 
 ### **Software Components**
 
@@ -211,20 +209,20 @@ Assuming that the host computer and the data collectors are already running as s
 ## **Project Setup**
 
 ## **Data Collectors Setup**
+
 @eduardz1
 <!-- TODO Fix hardware setup and copy here -->
 For a complete guide on how to set up the controllers,
-refer to the [controller setup](Setup-Instructions/controller-instructions.md)
+refer to the [controller setup](setup-instructions/controller-instructions.md)
 
 ### **Hardware Setup**
 
 ### **Software Setup**
 
-
-
 <br>
 
 ## **Actuator Setup**
+
 @eduardz1
 <!-- TODO Fix hardware setup and copy here -->
 
@@ -264,16 +262,19 @@ python3 -m collector --demo
 ```
 
 The demo will create a bucket named `demo` and will populate it with:
+
 - Pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
 - Plant measurements
 
 The pot measurements refer to a pot with
+
 - shelf_floor = 1
 - group_position = left
 - pot_position = right
 - plant_id = 1
 
 The plant measurements refer to a plant with
+
 - plant_id = 1
 - group_position = left
 - pot_position = right
@@ -281,11 +282,13 @@ The plant measurements refer to a plant with
 #### **Actuation Demo**
 
 To run a demo of the actuation system
+
 1. Setup the configuration files in `smol_scheduler\demo\smol_scheduler.jar` according to the current network setup
     - More information about the configuration files are available further down
 2. Run the following commands from the root of the `smol_scheduler` project:
 
 Execute:
+
 ```bash
 java -jar .\demo\smol_scheduler.jar
 ```
@@ -296,6 +299,7 @@ When the moisture of the pot reaches a certain threshold, the actuator will be t
 The threshold is fixed in the asset model.
 
 In particular it will repeat the following steps every `n` seconds (`n` is fixed in the configuration file):
+
 - Run the SMOL program to get the plants to be watered
 - Use REPL `dump` command to create the lifted state of the SMOL program
   - The lifted state is a knowledge graph representing the state of the greenhouse
@@ -305,12 +309,12 @@ In particular it will repeat the following steps every `n` seconds (`n` is fixed
   - Connecting via SSH to the actuator controlling the pump in the greenhouse
   - Executing the command to start the pump for 1 second (to be adjusted)
 
-
 <br>
 
 **SMOL scheduler needed files**
 
 To run the SMOL Scheduler you need to provide also
+
 - The SMOL file to be run
 - The asset model (Turtle file)
 - 3 configuration files
@@ -320,6 +324,7 @@ To run the SMOL Scheduler you need to provide also
 The SMOL program run in the demo is the `test_check_moisture.smol` file.
 
 It will:
+
 - Retrieve the plants from the asset model creating `Plant` objects with the following fields:
   - `plantId`
   - `idealMoisture`
@@ -333,7 +338,6 @@ It will:
 > NOTE: the `PlantToWater` object is created in order to be represented in the knowledge graph once the semantical lifting of the program state is performed. <br>
 > It will be used by the SMOL scheduler to trigger the actuation system.
 
-
 <br>
 
 **Asset model**
@@ -342,6 +346,7 @@ The asset model used in the demo is the `greenhouse.ttl` file. <br>
 As the moment it contains more information than needed. The relevant and used information for the demo is the following:
 
 Classes:
+
 - `Plant`
   - `plantId`: the id of the plant
   - `idealMoisture`: the ideal moisture of the plant
@@ -354,6 +359,7 @@ Classes:
   - `plantId`: the id of the plant placed in the pot
 
 Individuals:
+
 - `basilicum1`
   - `plantId = 1`
   - `idealMoisture = 50`
@@ -396,43 +402,30 @@ It uses a configuration file to get the GPIO PIN of the Raspberry PI to which th
 
 **Run the script**
 It takes as input the following parameters:
+
 - `command`: the command to execute. At the moment only `pump` is supported to trigger the water pump
 - if `command = pump`:
   - `seconds`: the number of seconds to keep the pump on
 
 <br>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
-
-
 
 ### **Run Project**
 
 #### **Run Data Collectors**
+
 For the reference on how to set up and run the data collectors refer to the [greenhouse-data-collector repository](https://github.com/N-essuno/greenhouse-data-collector)
 
 #### **Run Host Computer**
 
 ##### **InfluxDB**
 
-
 If you are running a linux distribution, there is no need to start influxDB manually;
 it will start automatically after the installation.
 
 ##### **SMOL Scheduler**
+
 The entry point of the project is the [SMOL scheduler](#smol-scheduler), which is responsible for running the SMOL program and sending the digital shadow to the user (eventually through an interface).
 Use the following commands to build and run the SMOL scheduler:
 
@@ -442,7 +435,4 @@ Use the following commands to build and run the SMOL scheduler:
   java -jar ./build/libs/smol_scheduler.jar
   ```
 
-
 <!-- TODO add info on how to run the SMOL scheduler, implement JAR creation and instructions on how to run JAR, add info about JRE installation on host computer-->
-
-
