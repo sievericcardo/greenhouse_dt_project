@@ -280,12 +280,10 @@ The plant measurements refer to a plant with
 
 #### **Actuation Demo**
 
-To run a demo of the actuation system, run the following commands on the host machine from the root of the smol_scheduler project:
-
-Build:
-```bash
-./gradlew build
-```
+To run a demo of the actuation system
+1. Setup the configuration files in `smol_scheduler\demo\smol_scheduler.jar` according to the current network setup
+    - More information about the configuration files are available further down
+2. Run the following commands from the root of the `smol_scheduler` project:
 
 Execute:
 ```bash
@@ -374,7 +372,7 @@ The configuration files need to stay in the same folder as the SMOL Scheduler JA
 The templates are available in the `smol_scheduler/src/main/resources` folder
 
 - `config_local.yml`: used by the SMOL program to access to influxDB
-  - NOTE: it used by the SMOL program and as now it's hardcoded in the SMOL program. You need to the the location of the file in the SMOL program code when running the influxDB queries.
+  - NOTE: it is used by the SMOL program and as now it's hardcoded in the SMOL program.
 - `config_scheduler.yml`: used by the SMOL scheduler to get the following information:
   - Path of the SMOL program
   - Path of the asset model
