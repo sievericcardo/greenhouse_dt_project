@@ -372,7 +372,7 @@ The configuration files need to stay in the same folder as the SMOL Scheduler JA
 The templates are available in the `smol_scheduler/src/main/resources` folder
 
 - `config_local.yml`: used by the SMOL program to access to influxDB
-  - NOTE: it is used by the SMOL program and as now it's hardcoded in the SMOL program.
+  - NOTE: it is used by the SMOL program and as now it's hardcoded in the SMOL program. You could need to change it.
 - `config_scheduler.yml`: used by the SMOL scheduler to get the following information:
   - Path of the SMOL program
   - Path of the asset model
