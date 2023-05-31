@@ -287,9 +287,9 @@ Build:
 ./gradlew build
 ```
 
-Execute
+Execute:
 ```bash
-java -jar .\build\libs\smol_scheduler.jar
+java -jar .\demo\smol_scheduler.jar
 ```
 
 The smol_scheduler will periodically run the smol program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
@@ -323,17 +323,18 @@ The SMOL program run in the demo is the `test_check_moisture.smol` file.
 
 It will:
 - Retrieve the plants from the asset model creating `Plant` objects with the following fields:
-  - Plant Id
-  - Ideal moisture
-- Retrieve from influxDB database the last moisture measurement of the pot in which the plant is placed
-  - This is done calling the `getPotMoisture()` of the `Plant` object
+  - `plantId`
+  - `idealMoisture`
+- This first step is done using an `AssetModel` object
+  - It contains a `getPlants()` method which runs a SPARQL query and returns a list of `Plant` objects structured as described above
+- Retrieve from influxDB database the last `moisture` measurement of the pot in which the plant is placed
+  - This is done calling the `getPotMoisture()` method of the `Plant` object. It runs a Flux query to get the last measurement.
 - For each plants which has `moisture < idealMoisture`:
-  - Create an `PlantToWater` object representing a Plant to be watered. The object contains just the id of the plant.
-
-<br>
+  - Create a `PlantToWater` object representing a plant to be watered. The object contains just the id of the plant.
 
 > NOTE: the `PlantToWater` object is created in order to be represented in the knowledge graph once the semantical lifting of the program state is performed. <br>
 > It will be used by the SMOL scheduler to trigger the actuation system.
+
 
 <br>
 
@@ -392,6 +393,7 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
 The actuator script is a python script used to physically trigger different components of the greenhouse (as the moment only the pump).
 
 **Config file**
+
 It uses a configuration file to get the GPIO PIN of the Raspberry PI to which the pump is connected. A template of the configuration file is available in the `actuator_script` folder.
 
 **Run the script**
@@ -415,7 +417,7 @@ It takes as input the following parameters:
 
 
 
-
+---
 
 
 
