@@ -269,14 +269,14 @@ The plant measurements refer to a plant with
 
 To run a demo of the actuation system
 
-1. Setup the configuration files in `smol_scheduler\demo\smol_scheduler.jar` according to the current network setup
+1. Setup the configuration files in `smol_scheduler/demo/` according to the current network setup
     - More information about the configuration files are available further down
 2. Run the following commands from the root of the `smol_scheduler` project:
 
 Execute:
 
 ```bash
-java -jar .\demo\smol_scheduler.jar
+./gradlew demo
 ```
 
 The smol_scheduler will periodically run the smol program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
