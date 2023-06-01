@@ -210,27 +210,13 @@ Assuming that the host computer and the data collectors are already running as s
 
 ## **Data Collectors Setup**
 
-@eduardz1
-<!-- TODO Fix hardware setup and copy here -->
 For a complete guide on how to set up the controllers,
 refer to the [controller setup](setup-instructions/controller-instructions.md)
 
-### **Hardware Setup**
-
-### **Software Setup**
-
-<br>
-
 ## **Actuator Setup**
 
-@eduardz1
-<!-- TODO Fix hardware setup and copy here -->
-
-### **Hardware Setup**
-
-### **Software Setup**
-
-<br>
+For a complete guide on how to set up the actuators,
+refer to the [actuator setup](setup-instructions/actuator-instructions.md)
 
 ## **Host Computer Setup**
 

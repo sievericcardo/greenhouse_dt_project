@@ -1,4 +1,4 @@
-# Steps to set up a raspberry pi controller
+# Steps to set up a raspberry pi controller for the sensors
 
 1. Update the system
     - `sudo apt-get update`
@@ -108,9 +108,11 @@ cv2.destroyAllWindows()
 
 ## Connect sensors to MCP3008 ADC
 
-1. Refer to the following schematics: <https://www.youtube.com/watch?v=Qgazac5v8P8> <!-- TODO: find or create a scheme -->
+1. Refer to the following schematics: ![MCP3008-schematics](MCP3008-schematics.png)
 2. Install dependencies:
     - `sudo apt-get install python3-spidev`
+
+The adc can accept 8 inputs in the 8 different channels, channel numbering starts from 0, the pin connected to the channel should be the data pin of the sensor, the other pins should be connected to a 3.3V/5v pin and to the ground pin.
 
 ### Classes needed to read the ADC and example script
 
@@ -143,7 +145,7 @@ class MCP3008:
 ```python
 
 from MCP3008 import MCP3008
-value = adc.read(channel = 0) # You can of course adapt he channel to be read out
+value = adc.read(channel = 0) # You can of course adapt the channel to be read out
 print("Applied voltage: %.2f" % (value / 1023.0 * 3.3))
 
 ```
