@@ -216,7 +216,7 @@ refer to the [controller setup](setup-instructions/controller-instructions.md)
 ## **Actuator Setup**
 
 For a complete guide on how to set up the actuators,
-refer to the [actuator setup](setup-instructions/actuator-instructions.md)
+refer to the [actuator setup](setup-instructions/actuators-setup.md)
 
 ## **Host Computer Setup**
 
@@ -239,9 +239,15 @@ sudo apt install openjdk-17-jdk openjdk-17-jre
 
 ### **Run Demo**
 
-#### **Data collection Demo**
+#### **Data collector**
 
-To execute a demo of the interaction between data collectors and host machine, run the following command on a data collector device, from the root of the data-collector project:
+To execute a demo of the interaction between data collectors and host machine, first pull the [data-collector repository](https://github.com/N-essuno/greenhouse-data-collector) from GitHub
+
+```bash
+git pull https://github.com/N-essuno/greenhouse-data-collector.git
+```
+
+Then run the following command from the root of the data-collector project:
 
 ```bash
 python3 -m collector --demo
@@ -265,11 +271,40 @@ The plant measurements refer to a plant with
 - group_position = left
 - pot_position = right
 
-#### **Actuation Demo**
+<br>
 
-To run a demo of the actuation system
+#### **Actuator**
 
-1. Setup the configuration files in `smol_scheduler/demo/` according to the current network setup
+The actuator script is a python script used to physically trigger different components of the greenhouse (as the moment only the pump).
+
+First you need to pull the [actuator repository](https://github.com/MarcoAmato/greenhouse_actuator) from GitHub
+```bash
+git pull https://github.com/MarcoAmato/greenhouse_actuator.git
+```
+
+**Run the script**
+It takes as input the following parameters:
+
+- `command`: the command to execute. At the moment only `water` is supported to trigger the water pump
+- if `command = water`:
+  - `GPIO_pin`: the GPIO pin activate for starting the pump
+  - `seconds`: the number of seconds to keep the pump on
+
+> **Note:** the mapping between GPIO_pin and actuator component is modeled in the asset model and based on this information the right component will always be activated. 
+
+<br>
+
+#### **SMOL scheduler**
+
+To run a demo of the SMOL scheduler system
+
+1. Pull the [SMOL scheduler repository](https://github.com/N-essuno/smol_scheduler) from GitHub
+
+```bash
+git pull https://github.com/N-essuno/smol_scheduler.git
+```
+
+1. Setup the configuration files in `smol_scheduler/demo/` according to your network setup
     - More information about the configuration files are available further down
 2. Run the following commands from the root of the `smol_scheduler` project:
 
@@ -279,21 +314,36 @@ Execute:
 ./gradlew demo
 ```
 
-The smol_scheduler will periodically run the smol program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
+> **Note:** if `./gradlew demo` fails it's possible to proceed doing the following:
+> 1. Run `./gradlew build`
+> 2. Copy the jar generated from `smol_scheduler/build/libs/` to your folder of choice (e.g., `smol_scheduler/demo/`)
+> 3. Proceed setting up the configuration files as described further down
+> 4. Run using `java -jar <jar_name>` from the folder where the jar is located
 
-When the moisture of the pot reaches a certain threshold, the actuator will be triggered and the pot will be watered.
+The smol_scheduler will periodically run a SMOL program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
+
+When the moisture of a pot is below a certain threshold, the actuator will be triggered and the pot will be watered.
 The threshold is fixed in the asset model.
 
 In particular it will repeat the following steps every `n` seconds (`n` is fixed in the configuration file):
 
 - Run the SMOL program to get the plants to be watered
-- Use REPL `dump` command to create the lifted state of the SMOL program
-  - The lifted state is a knowledge graph representing the state of the greenhouse
+- Run a SPARQL query on the SMOL program state
+  - The program state is a knowledge graph representing, among other information, also the state of the greenhouse
   - It will contain some triples with the predicate `PlantToWater_plantId`. The object of each of this triple is the id of a plant to be watered.
-- Retrieve the `PlantToWater_plantId` objects from the lifted state (which are the ids of the plants to be watered)
+- Retrieve, using the SPARQL query, the `PlantToWater_plantId` objects from the lifted state (which are the ids of the plants to be watered)
 - If there are plants to be watered it will trigger the actuation system for each of them. The trigger is done by:
   - Connecting via SSH to the actuator controlling the pump in the greenhouse
-  - Executing the command to start the pump for 1 second (to be adjusted)
+  - Executing the command to start the pump
+
+**Self-adaptation**
+
+This program will also run periodically a task which:
+
+1. Checks if the asset model has been changed
+2. If it has been changed then updates the configuration files used by the data-collectors
+    - E.g. information about which plant is in which pot and which sensor (pin/channel) is used to measure the pot moisture
+3. Sends the updated files to the data-collectors
 
 <br>
 
@@ -303,7 +353,13 @@ To run the SMOL Scheduler you need to provide also
 
 - The SMOL file to be run
 - The asset model (Turtle file)
-- 3 configuration files
+- 3 configuration files for the scheduler
+- 2 configuration files used by the data-collectors (one for each)
+    - They will be overwritten from the SMOL schduler in case of self-adaptation
+
+> **Note:** the data-collector configuration files are not used if running the data-collector demo version but they are needed always to run the SMOL scheduler
+
+More information on each point further down in this document.
 
 **SMOL program**
 
@@ -343,6 +399,10 @@ Classes:
   - `groupPosition`: the group on the shelf in which the pot is placed (left or right)
   - `potPosition`: the pot position with respect to the group in which the pot is placed (left or right)
   - `plantId`: the id of the plant placed in the pot
+  - `moistureAdcChannel`: the ADC channel used by the sensor to measure the moisture of the pot
+  - `pump`: the pump used to water the pot
+- `Pump`
+  - `pumpGpioPin`: the GPIO pin used to activate the pump
 
 Individuals:
 
@@ -354,6 +414,8 @@ Individuals:
   - `groupPosition = left`
   - `potPosition = left`
   - `plantId = 1`
+- `pump1`
+  - `pumpGpioPin = 18`
 
 <br>
 
@@ -368,30 +430,17 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
 - `config_scheduler.yml`: used by the SMOL scheduler to get the following information:
   - Path of the SMOL program
   - Path of the asset model
-  - Path of the lifted state output
-  - Domain prefix
+  - Path of the lifted state output directory (no more used)
+  - Name of the lifted state output file (no more used)
+  - Path of the asset model file (.ttl file)
+  - Domain prefix URI
   - Seconds between every execution of the SMOL program
+  - Local path of data-collectors config files (used by the self-adaptation task)
+  - Remote path of data-collectors config files (used by the self-adaptation task)
 - `config_ssh.yml`: used by the SMOL scheduler to get the following information:
-  - Actuator IP address (host)
-  - Actuator Username
-  - Actuator Password
-
-<br>
-
-#### **Actuator Script**
-
-The actuator script is a python script used to physically trigger different components of the greenhouse (as the moment only the pump).
-
-**Config file**
-
-It uses a configuration file to get the GPIO PIN of the Raspberry PI to which the pump is connected. A template of the configuration file is available in the `actuator_script` folder.
-
-**Run the script**
-It takes as input the following parameters:
-
-- `command`: the command to execute. At the moment only `pump` is supported to trigger the water pump
-- if `command = pump`:
-  - `seconds`: the number of seconds to keep the pump on
+    - IP address (host), username and password for
+      - Actuator
+      - Each data-collector
 
 <br>
 
