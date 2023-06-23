@@ -441,6 +441,28 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
     - IP address (host), username and password for
       - Actuator
       - Each data-collector
+- `config_shelf_1`: used by the data-collector on the first shelf to map sensor-data with assets and upload it in influxDB. It is structured as following (sample):
+  - `[influx2]`
+    - `url`: URL of the influxDB database
+    - `org`: organization name
+    - `token`: token to access the database
+  - `[sensor_switches]`
+    - `use_infrared_sensor`: boolean value to enable/disable the infrared sensor (in case not present)
+    - `use_light_sensor`: boolean value to enable/disable the light sensor (in case not present)
+  - `[moisture_values]`
+    - `XP`: array that can contain up to 100 values for the mapping between voltage registered by the sensor and moisture percentage
+  - `[light_level_values]`
+    - `XP`: array that can contain up to 100 values for the mapping to light level percentage (add more information)
+  - `[shelves]`
+    - `shelf_1`: JSON dictionary containing the mapping between a shelf and the GPIO pins corresponding to humidity and temperature sensors for that shelf
+      - Note: if a data collector controls more than one shelf, there will be a dictionary for each shelf
+  - `[pots]`
+    - `pot_1`: JSON dictionary containing the mapping between a pot (position), the ADC channel corresponding to the moisture sensor for that pot and the plant in that pot
+      - Note: if a data collector controls more than one pot, there will be a dictionary for each pot
+  - `[plants]`
+    - `plant_1`: JSON dictionary containing the plant id of a plant on the shelf of the data collector
+      - Note: if a data collector controls more than one plant, there will be a dictionary for each plant
+- `config_shelf_2`: same as before but for data collector in second shelf. It is needed because we assume there will be 2 shelves in the greenhouse, each one with its own data collector.
 
 <br>
 
