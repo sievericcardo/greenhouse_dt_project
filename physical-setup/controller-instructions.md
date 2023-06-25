@@ -35,7 +35,7 @@ import time
 import board
 import adafruit_dht
 
-# Initial the dht device, with data pin connected to:
+# Initialize the dht device, with whichever data pin it's connected to:
 dhtDevice = adafruit_dht.DHT22(board.D4)
 
 # you can pass DHT22 use_pulseio=False if you wouldn't like to use pulseio.

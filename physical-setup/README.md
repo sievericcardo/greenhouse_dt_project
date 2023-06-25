@@ -12,7 +12,7 @@ The responsibility that each pc has is as follows:
 
 As we can see the Router - used for the local network we're setting up - does not have to be a Raspberry and if you want to reproduce we would strongly recommend using a standard off-the-shelf router instead. Nonetheless this tutorial will also provide a basic guide on how to setup a raspberry as a wireless access point. The host computer can also act as the AP.
 
-We can use whichever computer we want as the host, this guide will assume you host computer runs a Debian based linux distribution but any OS should work with minimal changes.
+We can use whichever computer we want as the host, this guide will assume your host computer runs a Debian based linux distribution but any OS should work with minimal changes.
 
 The _Controller_ and _Actuator_ can be run on the same raspberry with minimal changes.
 
