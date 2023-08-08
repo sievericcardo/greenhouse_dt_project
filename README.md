@@ -206,6 +206,13 @@ Assuming that the host computer and the data collectors are already running as s
 5. After retrieving the data, the SMOL program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse.
 6. The SMOL scheduler retrieves the digital shadow of the greenhouse from the SMOL program and sends it to the user.
 
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+
 ## **Project Setup**
 
 ## **Data Collectors Setup**
