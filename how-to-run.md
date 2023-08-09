@@ -1,13 +1,13 @@
-## **Project Setup**
+# Project Setup
 
 We assume that Raspberry Pi OS is installed on all three systems
 
-## **Data Collectors Setup**
+## Data Collectors Setup
 
 For a complete guide on how to set up the controllers,
 refer to the [controller setup](setup-instructions/controller-instructions.md)
 
-## **Actuator Setup**
+## Actuator Setup
 
 For a complete guide on how to set up the actuators,
 refer to the [actuator setup](setup-instructions/actuators-setup.md)
@@ -35,17 +35,13 @@ sudo dpkg -i influxdb2-2.7.0-arm64.deb
 sudo apt install openjdk-17-jdk openjdk-17-jre
 ```
 
-## **How to Run**
+# How to Run
 
-### **Run Demo**
-
-#### Configuration files
+## Configuration files
 
 These are all the configuration files needed by the different components. Please prepare them before moving on to the next steps. You can use the samples provided.
 
-**SMOL Scheduler**
-
-The configuration files need to stay in the same folder as the SMOL Scheduler JAR file.
+The configuration files need to stay in the same folder as the **SMOL Scheduler JAR file**.
 
 The templates are available in the `smol_scheduler/src/main/resources` folder
 
@@ -80,7 +76,7 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
 
 <br>
 
-- `config_shelf_1`: used by the data-collector on the first shelf to map sensor-data with assets and upload it in influxDB. It is structured as following (sample):
+- `config_shelf_1.ini`: used by the data-collector on the first shelf to map sensor-data with assets and upload it in influxDB. It is structured as following (sample):
   - `[influx2]`
     - `url`: URL of the influxDB database (e.g., http://localhost:8086)
     - `org`: organization name (the one you saved while setting up influxDB)
@@ -104,30 +100,35 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
 
 <br>
 
-- `config_shelf_2`: same as before but for data collector in second shelf. It is needed because we assume there will be 2 shelves in the greenhouse, each one with its own data collector.
+- `config_shelf_2.ini`: same as before but for data collector in second shelf. It is needed because we assume there will be 2 shelves in the greenhouse, each one with its own data collector.
 
 
 
+## Data collector
 
-
-
-
-
-#### **Data collector**
-
-To execute a demo of the interaction between data collectors and host machine, first pull the [data-collector repository](https://github.com/N-essuno/greenhouse-data-collector) from GitHub
+- Clone the [data-collector repository](https://github.com/N-essuno/greenhouse-data-collector) from GitHub
 
 ```bash
 git clone https://github.com/N-essuno/greenhouse-data-collector.git
 ```
 
-Then run the following command from the root of the data-collector project:
+### Run the DEMO
+- If not present create a configuration file named `config.ini` into the `collector` folder.
+  - The file must contain at least the `influx2` section as described in the [configuration files section]().
+    - `[influx2]`
+    - `url`: URL of the influxDB database (e.g., http://localhost:8086)
+    - `org`: organization name (the one you saved while setting up influxDB)
+    - `token`: token to access the database (the one you saved while setting up influxDB)
+  - An example of the configuration file (`config.ini.example`) can be found in the project
+- Run the following command from the root of the data-collector project to start the demo program:
 
 ```bash
 python3 -m collector --demo
 ```
 
-The demo will create a bucket named `demo` and will populate it with:
+**Brief demo program description**
+
+The demo program will create a bucket named `demo` and will populate it with:
 
 - Pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
 - Plant measurements
@@ -145,18 +146,45 @@ The plant measurements refer to a plant with
 - group_position = left
 - pot_position = right
 
-<br>
 
-#### **Actuator**
+### (MANUAL) Run the main program
 
-The actuator script is a python script used to physically trigger different components of the greenhouse (as the moment only the pump).
+> **NOTE:** With the actual architectural configuration the Data Collectors should not be manually run. They are automatically started by the SMOL scheduler (host).
+We will write here how to run it manually just for completeness of information.
 
-First you need to pull the [actuator repository](https://github.com/MarcoAmato/greenhouse_actuator) from GitHub
+> Please ignore this section if you are trying to run the system how it is supposed to be run.
+
+- If not present create a configuration file named `config.ini` into the `collector` folder.
+  - The file must contain all the information as described in the [configuration files section]().
+  - An example of the configuration file (`config.ini.example`) can be found in the project
+- Run the following command from the root of the data-collector project to start the main program:
+
+```bash
+python3 -m collector
+```
+
+**Brief main program description**
+
+The main program will:
+
+- If not present, create a bucket named `greenhouse` in influxDB
+- Read periodically sensor data and load it into the bucket
+- If the configuration changes: self-adapt the data-collector to the new configuration
+
+## Actuator
+
+- Clone the [actuator repository](https://github.com/MarcoAmato/greenhouse_actuator) from GitHub
 ```bash
 git clone https://github.com/MarcoAmato/greenhouse_actuator.git
 ```
 
-**Run the script**
+### (MANUAL) Run the actuator
+
+> **NOTE:** With the actual architectural configuration the Actuators should not be manually run. Thery are automatically started by the SMOL scheduler (host).
+We will write here how to run it manually just for completeness of information.
+
+> Please ignore this section if you are trying to run the system how it is supposed to be run.
+
 It takes as input the following parameters:
 
 - `command`: the command to execute. At the moment only `water` is supported to trigger the water pump
@@ -164,11 +192,22 @@ It takes as input the following parameters:
   - `GPIO_pin`: the GPIO pin activate for starting the pump
   - `seconds`: the number of seconds to keep the pump on
 
+
+> Example:
+>
+>  `python3 -m actuator <command> <parameters>`
+> ```bash
+>  python3 -m actuator water 18 5
+>  ```
+
 > **Note:** the mapping between GPIO_pin and actuator component is modeled in the asset model and based on this information the right component will always be activated. 
 
-<br>
+**Brief actuator program description**
 
-#### **SMOL scheduler**
+The actuator script will be run from the SMOL scheduler (host) and will activate the pump to water the pot for the given number of seconds.
+
+
+## SMOL scheduler
 
 To run a demo of the SMOL scheduler system
 
