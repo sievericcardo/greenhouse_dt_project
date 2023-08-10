@@ -1,18 +1,44 @@
-# Project Setup
+## Table of Contents
 
-We assume that Raspberry Pi OS is installed on all three systems
+<!-- TODO: add simulations part -->
 
-## Data Collectors Setup
+- [Project setup](#project-setup)
+  - [Data collector setup](#data-collectors-setup)
+  - [Actuator setup](#actuator-setup)
+  - [Host computer setup](#python-influxdb-client)
+- [How to run](#how-to-run)
+  - [Configuration files](#configuration-files)
+  - [Data collector](#data-collector)
+    - [Run demo](#run-demo)
+    - [Manually run the main program](#manually-run-the-main-program)
+  - [Actuator](#actuator)
+    - [Manually run the actuator](#manually-run-the-actuator)
+  - [SMOL scheduler](#smol-scheduler)
+    - [SMOL scheduler needed files](#smol-scheduler-needed-files)
+    - [Run the SMOL scheduler](#run-the-smol-scheduler)
+- [Brief descriptions](#brief-functioning-descriptions)
+  - [Brief Data collector demo program functioning](#brief-data-collector-demo-program-functioning)
+  - [Brief Data collector main program functioning](#brief-data-collector-main-program-functioning)
+  - [Brief SMOL scheduler functioning](#brief-smol-scheduler-functioning)
+    - [Self-adaptation](#self-adaptation)
+    - [Brief asset model description](#brief-assets-model-description)
+    - [SMOL program description](#smol-program-description)
+
+# Project setup
+
+Please refer to [this](physical-setup/readme.md) for the physical setup.
+
+## Data collectors setup
 
 For a complete guide on how to set up the controllers,
-refer to the [controller setup](setup-instructions/controller-instructions.md)
+refer to the [controller setup](physical-setup/controller-instructions.md)
 
-## Actuator Setup
+## Actuator setup
 
 For a complete guide on how to set up the actuators,
-refer to the [actuator setup](setup-instructions/actuators-setup.md)
+refer to the [actuator setup](physical-setup/actuator-instructions.md)
 
-## **Host Computer Setup**
+## **Host computer setup**
 
 - **InfluxDB**
   - You can install influxDB on your host computer by following the [official guide](https://docs.influxdata.com/influxdb/v2.7/install/?t=Linux).
@@ -41,12 +67,18 @@ sudo apt install openjdk-17-jdk openjdk-17-jre
 
 These are all the configuration files needed by the different components. Please prepare them before moving on to the next steps. You can use the samples provided.
 
-The configuration files need to stay in the same folder as the **SMOL Scheduler JAR file**.
+The configuration files need to stay in the same folder as the **SMOL Scheduler JAR file**. How to create the JAR and run the SMOL Scheduler is explained in the [SMOL Scheduler section](#smol-scheduler).
 
-The templates are available in the `smol_scheduler/src/main/resources` folder
+You can create the configuration files assuming that you will have a folder in the Host computer with:
+- SMOL scheduler JAR
+- All configuration files
+- Asset model (.ttl file)
+- SMOL program (.smol file)
+
+The configuration templates with all the other files needed (asset model and SMOL program) are available in the `smol_scheduler/src/main/resources` folder
 
 - `config_local.yml`: used by the SMOL program to access to influxDB
-  - **NOTE**: it is used by the SMOL program and as now it's hardcoded in the SMOL program. You could need to change it.
+  - **NOTE**: it is used by the SMOL program and as now it's hardcoded in the SMOL program.
   - `url`: URL of the influxDB database (e.g., http://localhost:8086)
   - `token`: The token you saved while setting up influxDB
   - `org`: The name of the organization you created while setting up influxDB (**sirius_local**)
@@ -100,7 +132,10 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
 
 <br>
 
-- `config_shelf_2.ini`: same as before but for data collector in second shelf. It is needed because we assume there will be 2 shelves in the greenhouse, each one with its own data collector.
+- `config_shelf_2.ini`: same as before but for data collector in second shelf. It is needed because we assume there will be 2 shelves in the greenhouse, each one with its own data collector. <br>
+However, for simplicity, we deactivated in the software the second data collector. This means that:
+  - You **must** provide a configuration for the second data collector, but it will not be used by the software.
+    - The second data collector won't be started, won't collect data and its configuration won't be updated based on asset model changes.
 
 
 
@@ -112,9 +147,9 @@ The templates are available in the `smol_scheduler/src/main/resources` folder
 git clone https://github.com/N-essuno/greenhouse-data-collector.git
 ```
 
-### Run the DEMO
+### Run DEMO
 - If not present create a configuration file named `config.ini` into the `collector` folder.
-  - The file must contain at least the `influx2` section as described in the [configuration files section]().
+  - The file must contain at least the `influx2` section as described in the [configuration files section](#configuration-files) for the Data collector configuration.
     - `[influx2]`
     - `url`: URL of the influxDB database (e.g., http://localhost:8086)
     - `org`: organization name (the one you saved while setting up influxDB)
@@ -126,28 +161,10 @@ git clone https://github.com/N-essuno/greenhouse-data-collector.git
 python3 -m collector --demo
 ```
 
-**Brief demo program description**
-
-The demo program will create a bucket named `demo` and will populate it with:
-
-- Pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
-- Plant measurements
-
-The pot measurements refer to a pot with
-
-- shelf_floor = 1
-- group_position = left
-- pot_position = right
-- plant_id = 1
-
-The plant measurements refer to a plant with
-
-- plant_id = 1
-- group_position = left
-- pot_position = right
+You can find [here](#brief-data-collector-demo-program-functioning) a brief description of the Demo program functioning
 
 
-### (MANUAL) Run the main program
+### Manually run the main program
 
 > **NOTE:** With the actual architectural configuration the Data Collectors should not be manually run. They are automatically started by the SMOL scheduler (host).
 We will write here how to run it manually just for completeness of information.
@@ -155,7 +172,7 @@ We will write here how to run it manually just for completeness of information.
 > Please ignore this section if you are trying to run the system how it is supposed to be run.
 
 - If not present create a configuration file named `config.ini` into the `collector` folder.
-  - The file must contain all the information as described in the [configuration files section]().
+  - The file must contain all the information as described in the [configuration files section](#configuration-files) for the Data collector configuration.
   - An example of the configuration file (`config.ini.example`) can be found in the project
 - Run the following command from the root of the data-collector project to start the main program:
 
@@ -163,13 +180,8 @@ We will write here how to run it manually just for completeness of information.
 python3 -m collector
 ```
 
-**Brief main program description**
+You can find [here](#brief-data-collector-main-program-functioning) a brief description of the Demo program functioning
 
-The main program will:
-
-- If not present, create a bucket named `greenhouse` in influxDB
-- Read periodically sensor data and load it into the bucket
-- If the configuration changes: self-adapt the data-collector to the new configuration
 
 ## Actuator
 
@@ -178,7 +190,7 @@ The main program will:
 git clone https://github.com/MarcoAmato/greenhouse_actuator.git
 ```
 
-### (MANUAL) Run the actuator
+### Manually run the actuator
 
 > **NOTE:** With the actual architectural configuration the Actuators should not be manually run. Thery are automatically started by the SMOL scheduler (host).
 We will write here how to run it manually just for completeness of information.
@@ -202,36 +214,91 @@ It takes as input the following parameters:
 
 > **Note:** the mapping between GPIO_pin and actuator component is modeled in the asset model and based on this information the right component will always be activated. 
 
-**Brief actuator program description**
+**Brief Actuator functioning**
 
 The actuator script will be run from the SMOL scheduler (host) and will activate the pump to water the pot for the given number of seconds.
 
 
 ## SMOL scheduler
 
-To run a demo of the SMOL scheduler system
 
-1. Pull the [SMOL scheduler repository](https://github.com/N-essuno/smol_scheduler) from GitHub
+### SMOL scheduler needed files
+
+To run the SMOL Scheduler you need to provide:
+
+- The SMOL file to be run (`src/main/resources/test_check_moisture.smol`)
+- The asset model (`src/main/resources/greenhouse.ttl`)
+- Configuration files as described in the [configuration files section](#configuration-files)
+  - 3 configuration files for the scheduler
+  - 2 configuration files used by the data-collectors (one for each)
+
+### Run the SMOL scheduler
+
+- Clone the [SMOL scheduler repository](https://github.com/N-essuno/smol_scheduler) from GitHub
 
 ```bash
 git clone https://github.com/N-essuno/smol_scheduler.git
 ```
 
-1. Setup the configuration files in `smol_scheduler/demo/` according to your network setup
-    - More information about the configuration files are available further down
-2. Run the following commands from the root of the `smol_scheduler` project:
-
-Execute:
+- If not done yet, setup the configuration according to your network setup as explained in the [configuration files section](#configuration-files).
+- Build the project using gradle
 
 ```bash
 ./gradlew demo
 ```
+- The JAR will be gerated in the folder `smol_scheduler/build/libs/`. You can copy it to the folder of your choice (containing all the [needed files](#smol-scheduler-needed-files)) and run it from there.
+- Run the SMOL scheduler JAR
 
-> **Note:** if `./gradlew demo` fails it's possible to proceed doing the following:
-> 1. Run `./gradlew build`
-> 2. Copy the jar generated from `smol_scheduler/build/libs/` to your folder of choice (e.g., `smol_scheduler/demo/`)
-> 3. Proceed setting up the configuration files as described further down
-> 4. Run using `java -jar <jar_name>` from the folder where the jar is located
+```bash
+java -jar <jar_name>
+```
+
+You can find [here](#brief-smol-scheduler-functioning) a brief description of the SMOL scheduler functioning
+
+
+<br>
+
+---
+---
+
+<br>
+
+
+# Brief descriptions
+
+## Brief Data-collector DEMO program functioning
+
+The demo program will create a bucket named `demo` and will populate it with:
+
+- Pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
+- Plant measurements
+
+The pot measurements refer to a pot with
+
+- shelf_floor = 1
+- group_position = left
+- pot_position = right
+- plant_id = 1
+
+The plant measurements refer to a plant with
+
+- plant_id = 1
+- group_position = left
+- pot_position = right
+
+<br>
+
+## Brief Data-collector main program functioning
+
+The main program will:
+
+- If not present, create a bucket named `greenhouse` in influxDB
+- Read periodically sensor data and load it into the bucket
+- If the configuration changes: self-adapt the data-collector to the new configuration
+
+<br>
+
+## Brief SMOL scheduler functioning
 
 The smol_scheduler will periodically run a SMOL program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
 
@@ -249,7 +316,7 @@ In particular it will repeat the following steps every `n` seconds (`n` is fixed
   - Connecting via SSH to the actuator controlling the pump in the greenhouse
   - Executing the command to start the pump
 
-**Self-adaptation**
+### Self-adaptation
 
 This program will also run periodically a task which:
 
@@ -258,25 +325,57 @@ This program will also run periodically a task which:
     - E.g. information about which plant is in which pot and which sensor (pin/channel) is used to measure the pot moisture
 3. Sends the updated files to the data-collectors
 
-<br>
+### Brief asset model description
 
-**SMOL scheduler needed files**
+The asset model used is `greenhouse.ttl`. <br>
+As the moment it contains more information than needed. The relevant and used information for the is the following:
 
-To run the SMOL Scheduler you need to provide also
+Classes:
 
-- The SMOL file to be run
-- The asset model (Turtle file)
-- 3 configuration files for the scheduler
-- 2 configuration files used by the data-collectors (one for each)
-    - They will be overwritten from the SMOL schduler in case of self-adaptation
+- `Plant`
+  - `plantId`: the id of the plant
+  - `idealMoisture`: the ideal moisture of the plant
+  - Subclasses
+    - `Basilicum`
+- `Pot`
+  - `shelfFloor`: the shelf floor in which the pot is placed (1 or 2)
+  - `groupPosition`: the group on the shelf in which the pot is placed (left or right)
+  - `potPosition`: the pot position with respect to the group in which the pot is placed (left or right)
+  - `plantId`: the id of the plant placed in the pot
+  - `moistureAdcChannel`: the ADC channel used by the sensor to measure the moisture of the pot
+  - `wateredBy`: the pump used to water the pot
+- `Pump`
+  - `pumpGpioPin`: the GPIO pin used to activate the pump
 
-> **Note:** the data-collector configuration files are not used if running the data-collector demo version but they are needed always to run the SMOL scheduler
+Individuals:
 
-More information on each point further down in this document.
+- `basilicum1`
+  - `plantId = 1`
+  - `idealMoisture = 50`
+- `basilicum2`
+  - `plantId = 2`
+  - `idealMoisture = 50`
+- `pot1`
+  - `wateredBy = pump1`
+  - `shelfFloor = 1`
+  - `groupPosition = left`
+  - `potPosition = left`
+  - `plantId = 1`
+  - `moistureAdcChannel = 1`
+- `pot2`
+  - `wateredBy = pump1`
+  - `shelfFloor = 1`
+  - `groupPosition = left`
+  - `potPosition = right`
+  - `plantId = 2`
+  - `moistureAdcChannel = 2`
+- `pump1`
+  - `pumpId = 1`
+  - `pumpGpioPin = 18`
 
-**SMOL program**
+### SMOL program description
 
-The SMOL program run in the demo is the `test_check_moisture.smol` file.
+The SMOL program run in the demo is `test_check_moisture.smol`.
 
 It will:
 
@@ -293,50 +392,29 @@ It will:
 > NOTE: the `PlantToWater` object is created in order to be represented in the knowledge graph once the semantical lifting of the program state is performed. <br>
 > It will be used by the SMOL scheduler to trigger the actuation system.
 
-<br>
-
-**Asset model**
-
-The asset model used in the demo is the `greenhouse.ttl` file. <br>
-As the moment it contains more information than needed. The relevant and used information for the demo is the following:
-
-Classes:
-
-- `Plant`
-  - `plantId`: the id of the plant
-  - `idealMoisture`: the ideal moisture of the plant
-  - Subclasses
-    - `Basilicum`
-- `Pot`
-  - `shelfFloor`: the shelf floor in which the pot is placed (1 or 2)
-  - `groupPosition`: the group on the shelf in which the pot is placed (left or right)
-  - `potPosition`: the pot position with respect to the group in which the pot is placed (left or right)
-  - `plantId`: the id of the plant placed in the pot
-  - `moistureAdcChannel`: the ADC channel used by the sensor to measure the moisture of the pot
-  - `pump`: the pump used to water the pot
-- `Pump`
-  - `pumpGpioPin`: the GPIO pin used to activate the pump
-
-Individuals:
-
-- `basilicum1`
-  - `plantId = 1`
-  - `idealMoisture = 50`
-- `pot1`
-  - `shelfFloor = 1`
-  - `groupPosition = left`
-  - `potPosition = left`
-  - `plantId = 1`
-- `pump1`
-  - `pumpGpioPin = 18`
-
-<br>
 
 
 
-<br>
+<!--
+OLD PART FOR RUNNING SMOL SCHEDULER DEMO
 
----
+- Run the following commands from the root of the `smol_scheduler` project:
+
+```bash
+./gradlew demo
+```
+
+> **Note:** if `./gradlew demo` fails it's possible to proceed doing the following:
+> 1. Run `./gradlew build`
+> 2. Copy the jar generated from `smol_scheduler/build/libs/` to your folder of choice (e.g., `smol_scheduler/demo/`)
+> 3. Proceed setting up the configuration files as described further down
+> 4. Run using `java -jar <jar_name>` from the folder where the jar is located
+-->
+
+
+
+<!--
+OLD INFO ABOUT PROJECT RUN
 
 ### **Run Project**
 
@@ -362,4 +440,4 @@ Use the following commands to build and run the SMOL scheduler:
   java -jar ./build/libs/smol_scheduler.jar
   ```
 
-<!-- TODO add info on how to run the SMOL scheduler, implement JAR creation and instructions on how to run JAR, add info about JRE installation on host computer-->
+-->
