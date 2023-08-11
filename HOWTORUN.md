@@ -12,7 +12,7 @@
     - [Run demo](#run-demo)
     - [Manually run the main program](#manually-run-the-main-program)
   - [Actuator](#actuator)
-    - [Manually run the actuator](#manually-run-the-actuator)
+    - [Manually run the Actuator](#manually-run-the-actuator)
   - [SMOL scheduler](#smol-scheduler)
     - [SMOL scheduler needed files](#smol-scheduler-needed-files)
     - [Run the SMOL scheduler](#run-the-smol-scheduler)
@@ -35,8 +35,8 @@ refer to the [controller setup](physical-setup/controller-instructions.md)
 
 ## Actuator setup
 
-For a complete guide on how to set up the actuators,
-refer to the [actuator setup](physical-setup/actuator-instructions.md)
+For a complete guide on how to set up the Actuators,
+refer to the [Actuator setup](physical-setup/actuator-instructions.md)
 
 ## **Host computer setup**
 
@@ -189,7 +189,7 @@ You can find [here](#brief-data-collector-main-program-functioning) a brief desc
 
 ## Actuator
 
-- Clone the [actuator repository](https://github.com/MarcoAmato/greenhouse_actuator) from GitHub
+- Clone the [Actuator repository](https://github.com/MarcoAmato/greenhouse_actuator) from GitHub
 ```bash
 git clone https://github.com/MarcoAmato/greenhouse_actuator.git
 ```
@@ -216,7 +216,7 @@ It takes as input the following parameters:
 >  python3 -m actuator water 18 5
 >  ```
 
-> **Note:** the mapping between GPIO_pin and actuator component is modeled in the asset model and based on this information the right component will always be activated. 
+> **Note:** the mapping between GPIO_pin and Actuator component is modeled in the asset model and based on this information the right component will always be activated. 
 
 You can find [here](#brief-actuator-functioning) a brief description of the Actuator functioning
 
@@ -272,7 +272,7 @@ You can find [here](#brief-smol-scheduler-functioning) a brief description of th
 
 The demo program will create a bucket named `demo` and will populate it with:
 
-- Pot measurements with decreasing moisture, simulating a real life scenario which triggers the actuator to water the pot.
+- Pot measurements with decreasing moisture, simulating a real life scenario which triggers the Actuator to water the pot.
 - Plant measurements
 
 The pot measurements refer to a pot with
@@ -302,7 +302,7 @@ The main program will:
 
 ## Brief Actuator functioning
 
-The actuator script will be run from the SMOL scheduler (host) and will activate the pump to water the pot for the given number of seconds.
+The Actuator script will be run from the SMOL scheduler (host) and will activate the pump to water the pot for the given number of seconds.
 
 <br>
 
@@ -310,7 +310,7 @@ The actuator script will be run from the SMOL scheduler (host) and will activate
 
 The smol_scheduler will periodically run a SMOL program, which analyzes the data collected by the data collectors and triggers the actuation system when needed.
 
-When the moisture of a pot is below a certain threshold, the actuator will be triggered and the pot will be watered.
+When the moisture of a pot is below a certain threshold, the Actuator will be triggered and the pot will be watered.
 The threshold is fixed in the asset model.
 
 In particular it will repeat the following steps every `n` seconds (`n` is fixed in the configuration file):
@@ -321,7 +321,7 @@ In particular it will repeat the following steps every `n` seconds (`n` is fixed
   - It will contain some triples with the predicate `PlantToWater_plantId`. The object of each of this triple is the id of a plant to be watered.
 - Retrieve, using the SPARQL query, the `PlantToWater_plantId` objects from the lifted state (which are the ids of the plants to be watered)
 - If there are plants to be watered it will trigger the actuation system for each of them. The trigger is done by:
-  - Connecting via SSH to the actuator controlling the pump in the greenhouse
+  - Connecting via SSH to the Actuator controlling the pump in the greenhouse
   - Executing the command to start the pump
 
 ### Self-adaptation
