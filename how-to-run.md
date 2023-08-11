@@ -67,7 +67,7 @@ sudo apt install openjdk-17-jdk openjdk-17-jre
 
 These are all the configuration files needed by the different components. Please prepare them before moving on to the next steps. You can use the samples provided.
 
-The configuration files need to stay in the same folder as the **SMOL Scheduler JAR file**. How to create the JAR and run the SMOL Scheduler is explained in the [SMOL Scheduler section](#smol-scheduler).
+The configuration files need to stay in the same folder as the **SMOL Scheduler JAR file**. How to create the JAR and run the SMOL Scheduler is explained in the [SMOL Scheduler section](#smol-scheduler) (see later).
 
 You can create the configuration files assuming that you will have a folder in the Host computer with:
 - SMOL scheduler JAR
@@ -75,12 +75,12 @@ You can create the configuration files assuming that you will have a folder in t
 - Asset model (.ttl file)
 - SMOL program (.smol file)
 
-The configuration templates with all the other files needed (asset model and SMOL program) are available in the `smol_scheduler/src/main/resources` folder
+The configuration templates with all the other files needed (asset model and SMOL program) are available in the `smol_scheduler/src/main/resources` [folder](https://github.com/N-essuno/smol_scheduler/tree/master/src/main/resources)
 
 - `config_local.yml`: used by the SMOL program to access to influxDB
   - **NOTE**: it is used by the SMOL program and as now it's hardcoded in the SMOL program.
   - `url`: URL of the influxDB database (e.g., http://localhost:8086)
-  - `token`: The token you saved while setting up influxDB
+  - `token`: The token you saved while setting influxDB
   - `org`: The name of the organization you created while setting up influxDB (**sirius_local**)
   - `bucket`: The name of the bucket you created while setting up influxDB (**greenhouse**)
 
@@ -91,12 +91,16 @@ The configuration templates with all the other files needed (asset model and SMO
     - `lifted_state_output_path`: Path of the lifted state output directory (no longer used)
     - `lifted_state_output_file`: Name of the lifted state output file (no longer used)
     - `greenhouse_asset_model_file`: Path of the asset model file (.ttl file)
-    - `domain_prefix_uri`: Domain prefix URI
+    - `domain_prefix_uri`: Domain prefix URI (e.g., http://www.semanticweb.org/gianl/ontologies/2023/1/sirius-greenhouse#)
     - `interval_seconds`: Seconds between every execution of the SMOL program
-    - `local_shelf_1_data_collector_config_path`: Local path of data-collectors config file for shelf 1 (used by the self-adaptation task)
-    - `local_shelf_2_data_collector_config_path`: Local path of data-collectors config file for shelf 2 (used by the self-adaptation task)
-    - `shelf_1_data_collector_config_path`: Remote path of data-collectors config file for shelf 1 (used by the self-adaptation task)
-    - `shelf_2_data_collector_config_path`: Remote path of data-collectors config file for shelf 2 (used by the self-adaptation task)
+    - `local_shelf_1_data_collector_config_path`: The path in which the shelf 1 Data collector configuration file is stored on the host computer
+    - `local_shelf_2_data_collector_config_path`: The path in which the shelf 2 Data collector configuration file is stored on the host computer
+    - `shelf_1_data_collector_config_path`: The path in which the shelf 1 Data collector configuration is stored in the data collector raspberry itself
+    - `shelf_2_data_collector_config_path`: The path in which the shelf 2 data collector configuration is stored in the data collector raspberry itself
+
+> The `shelf_1_data_collector_config_path` (same for shelf_2) must point to a file named `config.ini` in the `collector` folder on the Data collector raspberry (`.../collector/config.ini`)
+
+
 
 <br>
 
@@ -104,11 +108,11 @@ The configuration templates with all the other files needed (asset model and SMO
     - IP address (host), username and password for
         - Testing
         - Actuator
-        - Each data-collector
+        - Each Data collector
 
 <br>
 
-- `config_shelf_1.ini`: used by the data-collector on the first shelf to map sensor-data with assets and upload it in influxDB. It is structured as following (sample):
+- `config_shelf_1.ini`: used by the Data collector on the first shelf to map sensor-data with assets and upload it in influxDB. It is structured as following:
   - `[influx2]`
     - `url`: URL of the influxDB database (e.g., http://localhost:8086)
     - `org`: organization name (the one you saved while setting up influxDB)
@@ -141,7 +145,7 @@ However, for simplicity, we deactivated in the software the second data collecto
 
 ## Data collector
 
-- Clone the [data-collector repository](https://github.com/N-essuno/greenhouse-data-collector) from GitHub
+- Clone the [Data collector repository](https://github.com/N-essuno/greenhouse-data-collector) from GitHub
 
 ```bash
 git clone https://github.com/N-essuno/greenhouse-data-collector.git
@@ -155,7 +159,7 @@ git clone https://github.com/N-essuno/greenhouse-data-collector.git
     - `org`: organization name (the one you saved while setting up influxDB)
     - `token`: token to access the database (the one you saved while setting up influxDB)
   - An example of the configuration file (`config.ini.example`) can be found in the project
-- Run the following command from the root of the data-collector project to start the demo program:
+- Run the following command from the root of the Data collector project to start the demo program:
 
 ```bash
 python3 -m collector --demo
@@ -166,7 +170,7 @@ You can find [here](#brief-data-collector-demo-program-functioning) a brief desc
 
 ### Manually run the main program
 
-> **NOTE:** With the actual architectural configuration the Data Collectors should not be manually run. They are automatically started by the SMOL scheduler (host).
+> **NOTE:** With the actual architectural configuration the Data collectors should not be manually run. They are automatically started by the SMOL scheduler (host).
 We will write here how to run it manually just for completeness of information.
 
 > Please ignore this section if you are trying to run the system how it is supposed to be run.
@@ -174,13 +178,13 @@ We will write here how to run it manually just for completeness of information.
 - If not present create a configuration file named `config.ini` into the `collector` folder.
   - The file must contain all the information as described in the [configuration files section](#configuration-files) for the Data collector configuration.
   - An example of the configuration file (`config.ini.example`) can be found in the project
-- Run the following command from the root of the data-collector project to start the main program:
+- Run the following command from the root of the Data collector project to start the main program:
 
 ```bash
 python3 -m collector
 ```
 
-You can find [here](#brief-data-collector-main-program-functioning) a brief description of the Demo program functioning
+You can find [here](#brief-data-collector-main-program-functioning) a brief description of the main program functioning
 
 
 ## Actuator
@@ -190,7 +194,7 @@ You can find [here](#brief-data-collector-main-program-functioning) a brief desc
 git clone https://github.com/MarcoAmato/greenhouse_actuator.git
 ```
 
-### Manually run the actuator
+### Manually run the Actuator
 
 > **NOTE:** With the actual architectural configuration the Actuators should not be manually run. Thery are automatically started by the SMOL scheduler (host).
 We will write here how to run it manually just for completeness of information.
@@ -200,7 +204,7 @@ We will write here how to run it manually just for completeness of information.
 It takes as input the following parameters:
 
 - `command`: the command to execute. At the moment only `water` is supported to trigger the water pump
-- if `command = water`:
+- if `command = "water"`:
   - `GPIO_pin`: the GPIO pin activate for starting the pump
   - `seconds`: the number of seconds to keep the pump on
 
@@ -214,9 +218,7 @@ It takes as input the following parameters:
 
 > **Note:** the mapping between GPIO_pin and actuator component is modeled in the asset model and based on this information the right component will always be activated. 
 
-**Brief Actuator functioning**
-
-The actuator script will be run from the SMOL scheduler (host) and will activate the pump to water the pot for the given number of seconds.
+You can find [here](#brief-actuator-functioning) a brief description of the Actuator functioning
 
 
 ## SMOL scheduler
@@ -224,13 +226,13 @@ The actuator script will be run from the SMOL scheduler (host) and will activate
 
 ### SMOL scheduler needed files
 
-To run the SMOL Scheduler you need to provide:
+To run the SMOL Scheduler you need to have:
 
 - The SMOL file to be run (`src/main/resources/test_check_moisture.smol`)
 - The asset model (`src/main/resources/greenhouse.ttl`)
 - Configuration files as described in the [configuration files section](#configuration-files)
   - 3 configuration files for the scheduler
-  - 2 configuration files used by the data-collectors (one for each)
+  - 2 configuration files used by the Data collectors (one for each)
 
 ### Run the SMOL scheduler
 
@@ -241,7 +243,7 @@ git clone https://github.com/N-essuno/smol_scheduler.git
 ```
 
 - If not done yet, setup the configuration according to your network setup as explained in the [configuration files section](#configuration-files).
-- Build the project using gradle
+- Build the project using gradle (from the root)
 
 ```bash
 ./gradlew demo
@@ -266,7 +268,7 @@ You can find [here](#brief-smol-scheduler-functioning) a brief description of th
 
 # Brief descriptions
 
-## Brief Data-collector DEMO program functioning
+## Brief Data collector DEMO program functioning
 
 The demo program will create a bucket named `demo` and will populate it with:
 
@@ -288,13 +290,19 @@ The plant measurements refer to a plant with
 
 <br>
 
-## Brief Data-collector main program functioning
+## Brief Data collector main program functioning
 
 The main program will:
 
 - If not present, create a bucket named `greenhouse` in influxDB
 - Read periodically sensor data and load it into the bucket
-- If the configuration changes: self-adapt the data-collector to the new configuration
+- If the configuration changes: self-adapt the Data collector to the new configuration
+
+<br>
+
+## Brief Actuator functioning
+
+The actuator script will be run from the SMOL scheduler (host) and will activate the pump to water the pot for the given number of seconds.
 
 <br>
 
@@ -321,9 +329,9 @@ In particular it will repeat the following steps every `n` seconds (`n` is fixed
 This program will also run periodically a task which:
 
 1. Checks if the asset model has been changed
-2. If it has been changed then updates the configuration files used by the data-collectors
+2. If it has been changed then updates the configuration files used by the Data collectors
     - E.g. information about which plant is in which pot and which sensor (pin/channel) is used to measure the pot moisture
-3. Sends the updated files to the data-collectors
+3. Sends the updated files to the Data collectors
 
 ### Brief asset model description
 
