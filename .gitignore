@@ -2,6 +2,7 @@
 common_resources/config_cloud.yml
 common_resources/config_local.yml
 common_resources/distribute.py
+.DS_Store
 
 #smol_run
 smol_run/output/
