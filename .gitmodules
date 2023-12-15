@@ -1,9 +1,0 @@
-[submodule "greenhouse-data-collector"]
-	path = greenhouse-data-collector
-	url = https://github.com/N-essuno/greenhouse-data-collector
-[submodule "SemanticObjectsOrig"]
-	path = SemanticObjects
-	url = https://github.com/smolang/SemanticObjects.git
-[submodule "smol_scheduler"]
-	path = smol_scheduler
-	url = https://github.com/N-essuno/smol_scheduler
