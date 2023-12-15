@@ -186,7 +186,7 @@ print("Applied voltage: %.2f" % (value / 1023.0 * 3.3))
     - `sudo pip3 install opencv-python`
     - `sudo apt install -y libatlas-base-dev`
 
-### Set up an automation scrip for the installation of the data collector
+### Set up an automation script for the installation of the data collector
 
 It is possible to create a script that will automatically install the data collector and all its dependencies. This is useful if you want to replicate the project on multiple devices. Once cloned the repository the following script need to be executed:
 
@@ -239,6 +239,8 @@ For the data collector, a `.img` file can be retrieved here. It can be saved on 
 
 To make the correct connection to the Message Broker via Python, the hostname of the raspberry pi needs to be changed according the id of the collector. This can be done by editing the `/etc/hostname` file and changing the hostname to `collector<id>`, where `<id>` is the id of the collector. The same name need to be used in the `/etc/hosts` file to map the hostname to the ip address of the raspberry pi.
 
+To code for the collector can be cloned from the [repository](https://github.com/sievericcardo/greenhouse-data-collector).
+
 ## Actuator setup
 
 ### Connect a relay for a pump
@@ -286,7 +288,10 @@ For the actuator, a `.img` file can be retrieved here. It can be saved on a 32 G
 - username: `lab`
 - password: `lab`
 
-
 ### Change the hostname for the actuator
 
 To make the correct connection to the Message Broker via Python, the hostname of the raspberry pi needs to be changed according the id of the actuator. This can be done by editing the `/etc/hostname` file and changing the hostname to `actuator<id>`, where `<id>` is the id of the pump for the specific plant (It is possible to have a single actuator with a single pump id if different pins are used). The same name need to be used in the `/etc/hosts` file to map the hostname to the ip address of the raspberry pi.
+
+### Clone the actuator code
+
+To code for the actuator can be cloned from the [repository](https://github.com/sievericcardo/greenhouse_actuator).
