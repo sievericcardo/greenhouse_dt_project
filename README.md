@@ -294,4 +294,4 @@ To make the correct connection to the Message Broker via Python, the hostname of
 
 ### Clone the actuator code
 
-To code for the actuator can be cloned from the [repository](https://github.com/sievericcardo/greenhouse_actuator](https://anonymous.4open.science/r/greenhouse_actuator-2CF3/README.md)https://anonymous.4open.science/r/greenhouse_actuator-2CF3/README.md).
+To code for the actuator can be cloned from the [repository](https://anonymous.4open.science/r/greenhouse_actuator-2CF3/README.md).
