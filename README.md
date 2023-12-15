@@ -1,6 +1,6 @@
 # Physical Setup
 
-This documents serves to provide step by step instructions to exactly reproduce the physical setup of the Greenhouse.
+This documents serves to provide step by step instructions to exactly reproduce the physical setup of the Greenhouse. The Greenhouse used in this project can be bought [here](https://www.biltema.no/en-no/leisure/garden/planting/greenhouse-cultivation/greenhouse-wood-69-x-49-cm-2000045538), but any Greenhouse can be used in the same way.
 
 The main components of the setup are:
 
