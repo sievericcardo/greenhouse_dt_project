@@ -228,6 +228,17 @@ sudo python3 raspi-blinka.py
 exit 1
 ```
 
+### Set up the data collector from the image
+
+For the data collector, a `.img` file can be retrieved here. It can be saved on a 32 GB microSD card with the `dd` utilities. The image is based on the Raspberry Pi OS 64bit version. The image is configured to use the following credentials:
+
+- username: `lab`
+- password: `lab`
+
+### Change the hostname for the collector
+
+To make the correct connection to the Message Broker via Python, the hostname of the raspberry pi needs to be changed according the id of the collector. This can be done by editing the `/etc/hostname` file and changing the hostname to `collector<id>`, where `<id>` is the id of the collector. The same name need to be used in the `/etc/hosts` file to map the hostname to the ip address of the raspberry pi.
+
 ## Actuator setup
 
 ### Connect a relay for a pump
@@ -267,3 +278,15 @@ def pump_water(sec, pump_pin):
         # stop pump when ctrl-c is pressed
         GPIO.cleanup()
 ```
+
+### Set up the actuator from the image
+
+For the actuator, a `.img` file can be retrieved here. It can be saved on a 32 GB microSD card with the `dd` utilities. The image is based on the Raspberry Pi OS 64bit version. The image is configured to use the following credentials:
+
+- username: `lab`
+- password: `lab`
+
+
+### Change the hostname for the actuator
+
+To make the correct connection to the Message Broker via Python, the hostname of the raspberry pi needs to be changed according the id of the actuator. This can be done by editing the `/etc/hostname` file and changing the hostname to `actuator<id>`, where `<id>` is the id of the pump for the specific plant (It is possible to have a single actuator with a single pump id if different pins are used). The same name need to be used in the `/etc/hosts` file to map the hostname to the ip address of the raspberry pi.
