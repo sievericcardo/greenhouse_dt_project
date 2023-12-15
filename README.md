@@ -1,208 +1,269 @@
-# OUTDATED, NEED TO BE UPDATED
+# Physical Setup
 
-# Greenhouse Twin Project
+This documents serves to provide step by step instructions to exactly reproduce the physical setup of the Greenhouse.
 
-Repository containing other repositories related to the greenhouse digital twin project
+The main components of the setup are:
 
-## Table of Contents
+- a _Controller_
+- an _Actuator_
+- a Router
+- a Host (provided as a vm)
 
-<!-- TODO: add simulations part -->
+The _Controller_ and _Actuator_ can be run on the same raspberry with minimal changes.
 
-- [Project Overview](#project-overview)
-- [Tools Overview](#tools-overview)
-  - [InfluxDB](#influxdb)
-  - [Python influxdb-client](#python-influxdb-client)
-  - [Python sensors libraries](#python-sensors-libraries)
-  - [OWL](#owl)
-  - [SMOL language](#smol-language)
-- [Project Architecture](#project-architecture)
-  - [Physical Architecture](#physical-architecture)
-    - [Greenhouse](#greenhouse)
-    - [Assets - Sensors](#assets---sensors)
-    - [Data collectors](#data-collectors)
-    - [Host computer](#host-computer)
-  - [Software Components](#software-components)
-    - [Sensors Scripts](#sensors-scripts)
-    - [Data Collectors Python program](#data-collectors-python-program)
-    - [Greenhouse asset model](#greenhouse-asset-model)
-    - [SMOL Twinning program](#smol-twinning-program)
-    - [SMOL scheduler](#smol-scheduler)
-  - [Execution flow](#execution-flow)
-- [How to run](#how-to-run)
+## OS Choice
 
-<!-- For reports also: results, discussion, conclusion -->
+The choice made for the project was `Raspberry Pi OS 64bit`. Any compatible operating system will work in practice, use the 32bit version if the raspberry is not compatible with 64bit operating systems (older than the Pi 4 and the Pi 4 with 4GB of RAM). It is also recommended to have a desktop environment at least on the host computer for a simpler data analysis.
 
-## Project Overview
+Finally, it is recommend to use the [Raspberry Pi Imager](https://www.raspberrypi.com/software) which can also be installed with apt: `sudo apt install rpi-imager`
 
-Digital twins have emerged as a promising technology that enables virtual replicas of physical assets, allowing for real-time monitoring, analysis, and simulation. These virtual replicas can be applied across various fields, including agriculture, manufacturing, healthcare, and more. In this research project, our focus is on building a digital twin for a greenhouse as an example to showcase the capabilities of this technology.
+## Controller setup
 
-Our approach involves developing a digital twin for a greenhouse using a combination of Python programming, SMOL language, and Raspberry Pi.
+Update the system at first with
+    - `sudo apt-get update`
+    - `sudo apt full-upgrade`
 
-The Python program is designed to interact with InfluxDB, a time-series database, to collect and store sensor data, while the SMOL language is used to create a representation of the assets and a knowledge graph that captures the relationships between different components of the greenhouse. The sensors, connected to various Raspberry Pi, are set up to collect data on various environmental parameters such as temperature, humidity, light, and soil moisture, providing a rich dataset for analysis.
+### Connect DHT22 sensor
 
-The primary objective of this research project is to create a functional example of a digital twin that can showcase its potential in monitoring and managing a greenhouse environment. By creating a virtual replica of the greenhouse, we can simulate and analyze its behavior, and gain insights into how different components interact with each other. This digital twin can serve as a valuable tool for optimizing greenhouse operations, improving resource utilization, and enhancing overall crop yield.
+1. Refer to the following schematics:
+![Schematics](imgs/Raspberry-Pi-Interface-with-a-DHT22-sensor-Wiring-Schematic.webp)
+2. Install dependencies:
+    - `sudo apt-get install python3-pip git`
+    - `sudo pip3 install --upgrade setuptools`
+3. Install adafruit-circuitpython-dht library (we avoid using the deprecated Adafruit_DHT one):
+    - `git clone https://github.com/donskytech/raspberrypi-projects`
+    - `cd raspberrypi-projects/dht22`
+4. Install circuitpython dependecies:
+    - `sudo pip3 install --upgrade adafruit-python-shell`
+    - `wget https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/raspi-blinka.py`
+    - `sudo python3 raspi-blinka.py`
+    - select yes when prompted for reboot
+5. Install the library:
+    - `pip3 install adafruit-circuitpython-dht`
 
-In this report, we will provide a detailed overview of the methodology used to develop the digital twin, present the results of our data analysis, discuss the implications of our findings, and highlight the potential applications of digital twins in various fields beyond agriculture. This research contributes to the growing body of knowledge on digital twins and serves as a practical example of their application in a real-world setting.
+#### Example script to read the sensor
 
-## **Tools Overview**
+Credits to <https://www.donskytech.com/raspberry-pi-how-to-interface-with-a-dht22-sensor/>
 
-### **InfluxDB**
+```python
 
-[InfluxDB](https://www.influxdata.com/products/influxdb-overview/) is a time-series database that is used to store the data collected by the data collectors.
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
 
-It is composed of buckets which contain measurements.
-Each measurement is composed by:
+import time
+import board
+import adafruit_dht
 
-- measurement name
-- tags
-  - Used as keys by us to identify the data
-- fields
-  - Used by us to store the actual data from sensors
-- timestamp
+# Initialize the dht device, with whichever data pin it's connected to:
+dhtDevice = adafruit_dht.DHT22(board.D18)
 
-and represents a single data point at a specific time.
+# you can pass DHT22 use_pulseio=False if you wouldn't like to use pulseio.
+# This may be necessary on a Linux single board computer like the Raspberry Pi,
+# but it will not work in CircuitPython.
+# dhtDevice = adafruit_dht.DHT22(board.D24, use_pulseio=False)
 
-This particular structure allows getting data for a specific time range and performing aggregations on it (e.g. mean)
+while True:
+    try:
+        # Print the values to the serial port
+        temperature_c = dhtDevice.temperature
+        humidity = dhtDevice.humidity
+        print(
+            "Temp: {:.1f} C    Humidity: {}% ".format(
+                temperature_c, humidity
+            )
+        )
 
-<!--
-TO ADD IN ANOTHER SECTION
-There is a single bucket in the database that is used to store all the data collected by the data collectors.
-Measurements from different assets have their own measurement name in the database.
-Each measurement has a set of fields that represent the data collected by the sensors, related to that asset. -->
+    except RuntimeError as error:
+        # Errors happen fairly often, DHT's are hard to read, just keep going
+        print(error.args[0])
+        time.sleep(2.0)
+        continue
+    except Exception as error:
+        dhtDevice.exit()
+        raise error
 
-### **Python influxdb-client**
+    time.sleep(2.0)
+```
 
-The [Python influxdb-client](https://influxdb-client.readthedocs.io/en/latest/) is a Python library that is used to interact with the InfluxDB database.
+### Use a webcam as approximation of a light sensor
 
-It is used by the data collectors to send data to the influxDB instance running on the host computer.
+1. Plug in a USB webcam
+2. Install dependencies:
+    - `pip install opencv-python` (one could use picamera2 instead but it has limited support for USB cameras, picamera is not supported on 64bit architectures)
+    - `sudo apt install libg11`
 
-### **Python sensors libraries**
+#### Example script to print light level
 
-<!-- TODO what should we say about the required libraries for the sensors other than they are listed all in greenhouse-data-collector/requirements.txt ? -->
+```python
 
-### **OWL**
+import cv2
 
-[OWL](https://www.w3.org/TR/owl-ref/) is a knowledge representation language that is used to represent the asset model of the greenhouse. In other words is used to create a formal representation of the greenhouse physical structure.
+from time import sleep
+
+cap = cv2.VideoCapture(0)
+
+sleep(2) #lets webcam adjust its exposure
+
+# Turn off automatic exposure compensation, this means that
+# the measurements are only significant when compared to the
+# first one, to get proper lux reading one should use a
+# proper light sensor
+cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
+
+while True:
+    ret, frame = cap.read()
+    grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    avg_light_level = cv2.mean(grey)[0]
+    print(avg_light_level)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+    sleep(1)
+
+cap.release()
+cv2.destroyAllWindows()
+
+```
 
-The asset model is used to represent the assets described in [Assets - Sensors](#assets---sensors) and the relationships between them.
+### Connect sensors (moisture) to MCP3008 ADC
+
+1. Refer to the following schematics: ![MCP3008-schematics](imgs/MCP3008-schematics.png)
+2. Install dependencies:
+    - `sudo apt-get install python3-spidev`
 
-### **SMOL Language**
+The adc can accept 8 inputs in the 8 different channels, channel numbering starts from 0, the pin connected to the channel should be the data pin of the sensor, the other pins should be connected to a 3.3V/5v pin and to the ground pin.
 
-[SMOL](https://smolang.org/) (Semantic Modeling Object Language) is an object-oriented language that, among others, allows to
+#### Classes needed to read the ADC and example script
 
-- Interact with influxDB to read data from the database
-- Read and query a knowledge graph, mapping the data read to objects in the language
-- Map the whole program state to a knowledge graph by means of the _semantic lifting_. The program state can then be queried to extract information
-- Represent and run simulations (FMO) and interact with modelica <!-- TODO: add information when we get it-->
+``` python
+#file: MCP3008.py
 
-In our case, it is used to connect the asset model to the data collected by the data collectors,
-perform the semantic lifting of the program state
-and interact with simulations to create the digital twin of the greenhouse.
+from spidev import SpiDev
 
-## Project Architecture
+class MCP3008:
+    def __init__(self, bus = 0, device = 0):
+        self.bus, self.device = bus, device
+        self.spi = SpiDev()
+        self.open()
+        self.spi.max_speed_hz = 1000000 # 1MHz
 
-### **Physical Architecture**
+    def open(self):
+        self.spi.open(self.bus, self.device)
+        self.spi.max_speed_hz = 1000000 # 1MHz
+    
+    def read(self, channel = 0):
+        adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
+        data = ((adc[1] & 3) << 8) + adc[2]
+        return data
+            
+    def close(self):
+        self.spi.close()
+```
 
-#### **Greenhouse**
+``` python
+from MCP3008 import MCP3008
 
-The specific greenhouse we are working with has the following characteristics:
+adc = MCP3008()
+value = adc.read(channel = 0) # You can of course adapt the channel to be read out
+print("Applied voltage: %.2f" % (value / 1023.0 * 3.3))
+```
 
-- The greenhouse is divided in two shelves.
-- Each shelf is composed of 1 group of plants.
-- A single water pump waters each group of plants.
-- 2 plants of the same type compose a group of plants.
-- Each plant is put inside a pot.
+### Connect raspberry pi NoIR camera
 
-#### **Assets - Sensors**
+1. Connect the camera to the raspberry pi
+2. It is possible that we need to modify the `/boot/config.txt` file to enable the camera:
+    - `sudo nano /boot/config.txt`
+    - uncomment the line `start_x=1`
+    - uncomment the line `gpu_mem=128`
+    - save and exit
+    - reboot
+3. Install dependencies:
+    - `sudo apt-get update`
+    - `sudo apt-get install -y python3-pyqt5 python3-opengl`
+    - `sudo apt-get install -y python3-picamera2 --no-install-recommends`
+    - `sudo pip3 install -U numpy`
+    - `sudo pip3 install opencv-python`
+    - `sudo apt install -y libatlas-base-dev`
 
-Here is a list of assets we are representing for our architecture, along with the sensors we are using to collect data on them:
+### Set up an automation scrip for the installation of the data collector
 
-- Greenhouse
-  - <!-- Put sensor names for each sensor --> Light
-- Shelves
-  - Temperature
-  - Air Humidity
-- Pots
-  - Soil Moisture
-- Plants
-  - Infrared camera: it calculates the NDVI (Normalized Difference Vegetation Index) of the plant. We will use this data to determine the health of the plant.
-- Water pumps
-  - Water flow
+It is possible to create a script that will automatically install the data collector and all its dependencies. This is useful if you want to replicate the project on multiple devices. Once cloned the repository the following script need to be executed:
 
-#### **Data collectors**
+```bash
+#!/bin/bash
 
-The data collectors are Raspberry Pi devices that collect data from the sensors and send it to the DB.
-Each data collector is associated to a greenhouse shelf and is responsible for collecting data on the assets that are located on that shelf.
+sudo apt update
+sudo apt install -y \
+    python3-pip \
+    python3-spidev \
+    python3-pyqt5 \
+    python3-opengl \
+    python3-picamera2 --no-install-recommends \
+    opencv-python \
+    libg11 \
+    libatlas-base-dev
 
-#### **Host computer**
+pip3 install opencv-python numpy
 
-The host computer runs
+# Modifies boot config to enable the camera
+sudo sed -i 's/# start_x=1/start_x=1/g' /boot/config.txt
+sudo sed -i 's/# gpu_mem=128/gpu_mem=128/g' /boot/config.txt
 
-- An InfluxDB instance that holds data retrieved from the [Data Collectors](#data-collectors)
-- A [Java program](#smol-scheduler) that periodically executes the [SMOL Twinning program](#smol-twinning-program), which is responsible for creating the digital twin of the greenhouse.
+sudo pip3 install --upgrade setuptools
 
-The user can interact with the digital twin though the host computer.
+# Install adafruit-circuitpython-dht library (we avoid using the deprecated Adafruit_DHT one)
+git clone https://github.com/donskytech/raspberrypi-projects
+cd raspberrypi-projects/dht22
 
-<!-- When we know: add also responsible for simulations (modelica) -->
+# Install circuitpython dependecies
+sudo pip3 install --upgrade adafruit-python-shell
 
-### **Software Components**
+wget https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/raspi-blinka.py
 
-#### **Sensors Scripts**
+echo "When prompted for reboot select yes, afterwards you should install the library \
+    with 'pip3 install adafruit-circuitpython-dht'"
+sudo python3 raspi-blinka.py
 
-They consist in python scripts that are run on the data collectors and are responsible for collecting data from the sensors and sending them to the influxDB instance on the host computer.
+exit 1
+```
 
-All the scripts are grouped in the `greenhouse-data-collector` project in the [sensors'](greenhouse-data-collector/collector/sensors) module. We chose to apply an OO approach to the problem where each measurement (Humidity, Moisture, Temperature...) is represented with a class. When not strictly coupled, physical sensor controllers and measurements are separated from each other, making the code more modular. Each class contains a `read()` method which returns the value, when needed the class may call an `Interpreter` to convert the raw value, in that case the mapping can be configured by modifying the [config.ini](greenhouse-data-collector/collector/config.ini.example) file.
+## Actuator setup
 
-<!-- TODO talk about NDVI, there are a lot of steps to take to make the number returned by the call to numpy.mean() significant -->
+### Connect a relay for a pump
 
-#### **Data collectors Python program**
+1. Refer to the following schematics: ![relay-to-pump-connection](imgs/relay-to-pump-connection.png)
+2. Use the library from git as referenced in the other module
 
-Python program that is run on the data collectors and is responsible for collecting data from the sensors and sending them to the influxDB instance on the host computer.
+#### Example script
 
-It achieves this by:
+```python
+import RPi.GPIO as GPIO
+from time import sleep
 
-- A virtual representation of the various assets in the greenhouse is created (E.g., Plants in the greenhouse).
-- Each virtual asset is connected to a set of physical sensors (E.g., Virtual plants are connected to the appropriate camera that retrieves plant health and growth).
-- Virtual assets periodically collect data from the sensors, create a data point containing the asset identifiers and the sensors' detection and send it to the host computer.
 
-### **Greenhouse Asset Model**
+def pump_water(sec, pump_pin):
+    print("Pumping water for {} seconds...".format(sec))
 
-The Greenhouse Asset Model is an OWL file
-representing the physical structure of the greenhouse and the relationships between the various assets in the greenhouse.
+    # set GPIO mode and set up the pump pin
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pump_pin, GPIO.OUT)
 
-The SMOL program uses the asset model individuals as a starting point for twinning the greenhouse.
+    try:
+        # turn the pump off for 0.25 seconds
+        GPIO.output(pump_pin, GPIO.LOW)
+        sleep(0.25)
 
-Here follows a picture of the asset model:
+        # turn the pump on for the given time
+        GPIO.output(pump_pin, GPIO.HIGH)
+        sleep(sec)
 
-<!-- TODO: add picture of the asset model -->
+        # turn the pump off
+        GPIO.cleanup()
 
-### **SMOL Twinning program**
+        print("Done pumping water.")
 
-The SMOL program is run by the host computer and is responsible for creating the digital twin of the greenhouse.
-
-It achieves this by:
-
-- Reading the asset model from the OWL file
-- Generating SMOL objects from the asset model individuals
-- For each asset object, retrieves sensor detections for that specific asset from the influxDB database (E.g., Retrieve moisture data for a specific pot).
-- After retrieving the data, the program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse.
-
-### **SMOL scheduler**
-
-The SMOL program is run periodically by the host computer to retrieve the digital shadow of the greenhouse.
-A simple Java program is used to schedule the execution of the SMOL program.
-
-## **Execution Flow**
-
-Assuming that the host computer and the data collectors are already running as specified in the [Project Setup](#project-setup) section, the execution flow is the following:
-
-1. The data collectors periodically collect data from the sensors and send them to the influxDB database.
-2. the SMOL Scheduler periodically runs The SMOL program.
-3. The SMOL program retrieves the asset model from the OWL file and generates SMOL objects from the asset model individuals.
-4. For each asset object, the SMOL program retrieves sensor detections for that specific asset from the influxDB database.
-5. After retrieving the data, the SMOL program performs the semantic lifting of the program state, creating a knowledge graph that represents the state of the assets in the greenhouse.
-6. The SMOL scheduler retrieves the digital shadow of the greenhouse from the SMOL program and sends it to the user.
-
-## How to run
-
-Check the [How to run doc](HOWTORUN.md) for instructions on how to run the project.
+    except KeyboardInterrupt:
+        # stop pump when ctrl-c is pressed
+        GPIO.cleanup()
+```
