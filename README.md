@@ -230,7 +230,7 @@ exit 1
 
 ### Set up the data collector from the image
 
-For the data collector, a `.img` file can be retrieved here. It can be saved on a 32 GB microSD card with the `dd` utilities. The image is based on the Raspberry Pi OS 64bit version. The image is configured to use the following credentials:
+For the data collector, a `.img` file can be retrieved [here](https://figshare.com/s/00c583777ba6258c3d4c). It can be saved on a 32 GB microSD card with the `dd` utilities. The image is based on the Raspberry Pi OS 64bit version. The image is configured to use the following credentials:
 
 - username: `lab`
 - password: `lab`
@@ -283,7 +283,7 @@ def pump_water(sec, pump_pin):
 
 ### Set up the actuator from the image
 
-For the actuator, a `.img` file can be retrieved here. It can be saved on a 32 GB microSD card with the `dd` utilities. The image is based on the Raspberry Pi OS 64bit version. The image is configured to use the following credentials:
+For the actuator, a `.img` file can be retrieved [here](https://figshare.com/s/a97674ae14d9631d293b). It can be saved on a 32 GB microSD card with the `dd` utilities. The image is based on the Raspberry Pi OS 64bit version. The image is configured to use the following credentials:
 
 - username: `lab`
 - password: `lab`
