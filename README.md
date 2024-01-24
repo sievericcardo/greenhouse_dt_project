@@ -239,7 +239,7 @@ For the data collector, a `.img` file can be retrieved [here](https://doi.org/10
 
 To make the correct connection to the Message Broker via Python, the hostname of the raspberry pi needs to be changed according the id of the collector. This can be done by editing the `/etc/hostname` file and changing the hostname to `collector<id>`, where `<id>` is the id of the collector. The same name need to be used in the `/etc/hosts` file to map the hostname to the ip address of the raspberry pi.
 
-To code for the collector can be cloned from the [repository](https://anonymous.4open.science/r/greenhouse-data-collector-86F6/README.md).
+To code for the collector can be cloned from the [repository](https://github.com/N-essuno/greenhouse-data-collector).
 
 ## Actuator setup
 
@@ -294,4 +294,4 @@ To make the correct connection to the Message Broker via Python, the hostname of
 
 ### Clone the actuator code
 
-To code for the actuator can be cloned from the [repository](https://anonymous.4open.science/r/greenhouse_actuator-2CF3/README.md).
+To code for the actuator can be cloned from the [repository](https://github.com/MarcoAmato/greenhouse_actuator).
